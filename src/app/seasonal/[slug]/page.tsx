@@ -1,7 +1,7 @@
 import { client } from '../../lib/apollo-client';
 import { gql } from '@apollo/client'
 import InfiniteScrollTemplates from '../../components/InfiniteScrollTemplates';
-import { getCategoriesData } from '../../lib/categories';
+//import { getCategoriesData } from '../../lib/categories';
 import MarketingAgency from "app/components/MarketingAgency";
 import { Params } from 'next/dist/server/request/params';
 import { getBrandData } from 'app/lib/queries';
@@ -103,7 +103,7 @@ export default async function SeasonalPage({ params }: { params: Promise<Params>
   });
 
   const seasonalNode = data.seasonals?.nodes?.[0];
-  const categoriesData = await getCategoriesData();
+  //const categoriesData = await getCategoriesData();
   const { adBoxes } = await getBrandData();
   // If no data is found, show message
   if (!seasonalNode) {
