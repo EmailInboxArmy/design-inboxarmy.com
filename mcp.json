@@ -1,0 +1,14 @@
+{
+    "mcpServers": {
+        "figma": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-figma"
+            ],
+            "env": {
+                "FIGMA_ACCESS_TOKEN": "figd_h2cuUD_8Gx1VynkZhA7sya7W66CDDk1LG5CK-K4_"
+            }
+        }
+    }
+}

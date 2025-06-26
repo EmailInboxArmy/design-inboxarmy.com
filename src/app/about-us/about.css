@@ -1,0 +1,240 @@
+.page-about-us .top-header {
+    background: transparent;
+}
+.page-about-us .search-row,
+.page-about-us .search-row input {
+    background-color: #ffffff;
+}
+
+.top-header.sticky-header {
+    background: #1B2005;
+    background: linear-gradient(90deg, rgba(27, 32, 5, 1) 0%, rgba(46, 59, 0, 1) 100%);
+    transition: all 0.3s ease-in-out;
+}
+
+.gallery-wrapper .image-box:nth-child(1),
+.gallery-wrapper .image-box:nth-child(4),
+.gallery-wrapper .image-box:nth-child(5) {
+    grid-column: span 2;
+}
+
+.image-box {
+    box-shadow: -15px 10px 0 var(--theme-dark);
+}
+
+.content-text p {
+    padding-bottom: 32px;
+}
+
+.content-text p:last-child {
+    padding-bottom: 0;
+}
+
+
+
+.closebtn {
+    background: none;
+    border: none;
+}
+
+.emailservice img {
+    width: auto;
+    height: auto;
+}
+
+.emailservice .slick-prev {
+    display: none !important;
+}
+
+.emailservice .slick-list {
+    position: relative;
+}
+
+.emailservice .slick-list:after {
+    content: ' ';
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 20rem;
+    background: rgb(255, 255, 255);
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, var(--theme-light-gray) 70%, var(--theme-light-gray) 100%);
+}
+
+.emailservice.testimonial-slider .slick-arrow.slick-next {
+    right: -50px;
+}
+
+.logowrap {
+    height: 110px;
+}
+
+.logowrap img {
+    max-height: 70px;
+    max-width: 180px;
+    display: block;
+    margin: 0 auto;
+}
+
+.brand-logo img {
+    max-width: 177px;
+    max-height: 80px;
+}
+
+
+
+.award-row {
+    max-width: 144px;
+    max-height: 160px;
+    width: 100%;
+}
+
+.award-row img {
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+
+.industry-card-wrapper .cardwrap:nth-child(4),
+.industry-card-wrapper .cardwrap:nth-child(1) {
+    margin-top: 62px;
+}
+
+.industry-card-wrapper .cardwrap:nth-child(3) {
+    margin-top: 93px;
+}
+
+.industry-card-wrapper .cardwrap:nth-child(5) {
+    margin-top: 25px;
+}
+
+.industry-card-wrapper .cardwrap:nth-child(6) {
+    margin-top: 104px;
+}
+
+.industry-card-wrapper .cardwrap:nth-child(7) {
+    margin-top: 54px;
+}
+
+
+@media(max-width: 1500px) {
+    .small-container {
+        max-width: 1170px;
+    }
+
+    .logowrap img {
+        max-height: 60px;
+        max-width: 160px;
+    }
+
+    .industry-card-wrapper .cardwrap:nth-child(7) {
+        margin-top: 54px;
+    }
+
+    .industry-card-wrapper .cardwrap:nth-child(6) {
+        margin-top: 70px;
+    }
+
+    .industry-card-wrapper .cardwrap:nth-child(4),
+    .industry-card-wrapper .cardwrap:nth-child(1) {
+        margin-top: 60px;
+    }
+
+    .industry-card-wrapper .cardwrap:nth-child(3) {
+        margin-top: 50px;
+    }
+
+
+}
+
+@media(max-width: 1280px) {
+    .emailservice.testimonial-slider .slick-arrow.slick-next {
+        right: 0;
+    }
+
+    .industry-card-wrapper {
+        max-width: 768px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .industry-card-wrapper .cardwrap {
+        margin: 10px 0 !important;
+    }
+
+    .image-box {
+        box-shadow: -8px 6px 0 var(--theme-dark);
+    }
+
+
+}
+
+@media(max-width: 1024px) {
+    .emailservice .slick-list:after {
+        display: none;
+    }
+
+    .emailservice .slick-slider {
+        padding: 0 50px;
+    }
+
+    .emailservice.testimonial-slider .slick-arrow.slick-prev {
+        display: block !important;
+        left: 0;
+    }
+
+    .email-service-title h2 br {
+        display: none;
+    }
+
+    .industry-title br {
+        display: none;
+    }
+}
+
+@media(max-width: 767px) {
+    .top-header {
+        background: #ffffff;
+    }
+
+    .top-header.sticky-header {
+        background: #1B2005;
+        background: linear-gradient(90deg, rgba(27, 32, 5, 1) 0%, rgba(46, 59, 0, 1) 100%);
+        transition: all 0.3s ease-in-out;
+    }
+
+    .logowrap {
+        height: 80px;
+    }
+
+    .logowrap img {
+        max-width: 100%;
+        max-height: 100% !important;
+    }
+
+    .emailservice .slick-slider {
+        padding: 0;
+    }
+
+    .brand-logo img {
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    .counter-row br {
+        display: none;
+    }
+
+    .award-row {
+        max-width: 80px;
+        max-height: 100px;
+    }
+
+
+
+
+}

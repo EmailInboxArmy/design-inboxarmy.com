@@ -1,0 +1,204 @@
+.map-wrap iframe {
+    height: 280px;
+    width: 100%;
+}
+
+
+.contact-form select,
+.contact-form textarea,
+.contact-form input[type="text"],
+.contact-form input[type="tel"],
+.contact-form input[type="email"],
+.contact-form input[type="number"] {
+    background-color: #ffffff;
+    font-size: 16px;
+    line-height: 1.4;
+    color: var(--theme-dark);
+    border: 1px solid #E0E0E0;
+    padding: 20px;
+    border-radius: 12px;
+    outline: none;
+    box-shadow: none;
+}
+
+.contact-form input::-webkit-input-placeholder {
+    color: var(--theme-dark);
+}
+
+.contact-form input::-moz-placeholder {
+    color: var(--theme-dark);
+}
+
+.contact-form input:-ms-input-placeholder {
+    color: var(--theme-dark);
+}
+
+.contact-form input:-moz-placeholder {
+    color: var(--theme-dark);
+}
+
+.contact-form textarea::-webkit-input-placeholder {
+    color: var(--theme-dark);
+}
+
+.contact-form textarea::-moz-placeholder {
+    color: var(--theme-dark);
+}
+
+.contact-form textarea:-ms-input-placeholder {
+    color: var(--theme-dark);
+}
+
+.contact-form textarea:-moz-placeholder {
+    color: var(--theme-dark);
+}
+
+.contact-form textarea {
+    height: 96px;
+}
+
+.multiselectbox .search-wrapper {
+    padding: 0px;
+    border: none;
+    padding: 15px 50px 20px 20px;
+    min-height: 64px;
+    background: #ffffff;
+    border-radius: 9px;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    position: relative;
+}
+
+.multiselectbox .chip {
+    position: relative;
+    z-index: 2;
+}
+
+.multiselectbox .chip+.searchBox {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.contact-form .multiselectbox .searchBox {
+    padding: 0px;
+    border: none;
+    border-radius: 0;
+}
+
+.optionListContainer li {
+    position: relative;
+    display: block;
+    color: var(--dark-brown);
+    padding: 10px 15px 10px 40px !important;
+    margin: 0;
+    position: relative;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1.4;
+    font-weight: 400;
+    border-radius: 0;
+    background-color: #ffffff;
+}
+
+.optionListContainer li:before {
+    content: "";
+    height: 20px;
+    width: 20px;
+    background-color: #d9d9d9;
+    border-radius: 0.125rem;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    left: 12px;
+}
+
+.optionListContainer li input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.optionListContainer li.selected:before {
+    background-color: var(--theme-blue);
+    background: var(--theme-blue) url(../images/check-arrow.svg) no-repeat center;
+    background-size: 10px;
+}
+
+.search-wrapper.searchWrapper {
+    border: 1px solid #E0E0E0;
+    background-image: url(../images/new-black-down-icon.svg);
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 12px;
+    cursor: pointer;
+}
+
+.multiSelectContainer ul {
+    margin-top: 0 !important;
+}
+
+.newsletter-checkbox label:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    background-color: #E0E0E0;
+    border-radius: 5px;
+}
+
+.newsletter-checkbox input:checked~label:before {
+    background: var(--theme-blue) url(../images/check-arrow.svg) no-repeat center;
+    background-size: 12px;
+}
+
+.newsletter-checkbox input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 25px;
+    height: 25px;
+    opacity: 0;
+}
+
+.newsletter-checkbox {
+    position: relative;
+}
+
+.newsletter-checkbox label {
+    font-size: 16px;
+    line-height: 1.4;
+    font-weight: 400;
+    color: var(--theme-dark);
+    position: relative;
+    padding-left: 30px;
+    cursor: pointer;
+}
+
+@media (max-width: 767px) {
+    .multiselectbox .chip {
+        white-space: break-spaces;
+    }
+}
+
+@media (max-width: 340px) {
+    .multiselectbox .chip {
+        font-size: 12px !important;
+    }
+}
