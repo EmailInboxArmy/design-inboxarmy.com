@@ -1,7 +1,7 @@
 import { client } from '../../lib/apollo-client';
 import { gql } from '@apollo/client'
 import InfiniteScrollTemplates from '../../components/InfiniteScrollTemplates';
-import { getCategoriesData } from '../../lib/categories';
+//import { getCategoriesData } from '../../lib/categories';
 import MarketingAgency from "app/components/MarketingAgency";
 import { Params } from 'next/dist/server/request/params';
 import { getBrandData } from '../../lib/queries';
@@ -102,7 +102,7 @@ export default async function EmailTypePage({ params }: { params: Promise<Params
   });
 
   const emailTypeNode = data.emailTypes?.nodes?.[0];
-  const categoriesData = await getCategoriesData();
+  //const categoriesData = await getCategoriesData();
 
   // If no data is found, show message
   if (!emailTypeNode) {
