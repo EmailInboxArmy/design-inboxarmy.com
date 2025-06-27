@@ -64,6 +64,7 @@ export default async function RootLayout({
 }) {
   return (
     <html lang="en">
+    <meta name="robots" content="noindex,nofollow" />
       <body>
         <BodyClassHandler />
         <GlobalLoader />

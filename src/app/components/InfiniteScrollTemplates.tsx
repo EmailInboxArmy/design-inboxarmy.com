@@ -74,7 +74,7 @@ function AdCard({ adBox }: { adBox: AdBox }) {
             </div>
 
             <div className="absolute left-4 right-4 bottom-6 md:bottom-4 2xl:left-8 2xl:right-8 2xl:bottom-8">
-                <span className="block bg-theme-blue text-white hover:bg-white hover:text-theme-dark font-semibold px-1 md:px-5 py-3 md:py-4 rounded-lg whitespace-nowrap border-none uppercase text-sm md:text-base">
+                <span className="block bg-theme-blue text-white hover:bg-white hover:text-theme-dark font-semibold px-1 md:px-5 py-3 md:py-4 rounded-lg whitespace-nowrap border-none uppercase text-xs md:text-base">
                     {adBox.cta?.title || 'Explore More'}
                 </span>
             </div>
