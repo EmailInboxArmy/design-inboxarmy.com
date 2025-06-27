@@ -21,7 +21,36 @@ const httpLink = new HttpLink({
 
 export const client = new ApolloClient({
     link: from([errorLink, httpLink]),
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+        typePolicies: {
+            Page: {
+                keyFields: ['id', 'slug'],
+                fields: {
+                    // Merge function for Page type
+                    __typename: {
+                        read() {
+                            return 'Page';
+                        },
+                    },
+                },
+            },
+            Post: {
+                keyFields: ['id', 'slug'],
+            },
+            MediaItem: {
+                keyFields: ['id', 'sourceUrl'],
+            },
+            PostTypeSEO: {
+                keyFields: false, // No unique identifier needed
+            },
+            AboutUs: {
+                keyFields: false, // No unique identifier needed
+            },
+            AboutUsLogoImages: {
+                keyFields: false, // No unique identifier needed
+            },
+        },
+    }),
     defaultOptions: {
         watchQuery: {
             errorPolicy: 'all',
