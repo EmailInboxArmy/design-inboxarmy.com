@@ -13,6 +13,8 @@ import BodyClassHandler from './components/BodyClassHandler';
 const GET_HOME_PAGE_DATA = gql`
 query HomePage {
     page(id: "home", idType: URI) {
+    id
+    slug
     seo {
       title
       metaDesc
