@@ -133,18 +133,21 @@ const GET_MENUDATA_QUERY = gql`
       nodes {
         name
         slug
+        count
       }
     }
     seasonals(first: 1000000) {
       nodes {
         name
         slug
+        count
       }
     }
     industries(first: 1000000) {
       nodes {
         name
         slug
+        count
       }
     }
   }

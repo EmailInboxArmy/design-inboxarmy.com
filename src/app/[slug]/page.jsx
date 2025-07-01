@@ -340,6 +340,8 @@ export default async function PostDetail({ params }) {
                                                                 <span className="pl-1 md:pl-2 font-medium">Download</span>
                                                             </a>
                                                         )}
+                                                        
+                                                        
                                                     </div>
                                                 </div>
                                             </header>

@@ -23,14 +23,24 @@ interface EmailCardProps {
         };
     };
     slug: string;
+    activeTagSlug?: string;
 }
 
 export default function EmailCard({
     title,
     image,
     template,
-    slug
+    slug,
+    activeTagSlug
 }: EmailCardProps) {
+    // Helper function to check if a tag is active
+    const isTagActive = (tagName: string) => {
+        if (!activeTagSlug) return false;
+        const tagSlug = tagName.toLowerCase().replace(/\s+/g, '-');
+        return activeTagSlug === tagSlug;
+    };
+    console.log(image);
+
     return (
         <Link href={`/${slug}`} className="email-link w-full bg-white shadow-custom rounded-md md:rounded-xl border border-solid border-theme-border overflow-hidden">
             <div className="email-image relative w-full overflow-hidden">
@@ -41,23 +51,41 @@ export default function EmailCard({
             <div className="p-2 md:p-4">
                 <p className="text-theme-dark text-sm md:text-base mb-2">{title}</p>
                 <div className="catagery-data flex flex-wrap gap-1">
-                    {template.emailTypes?.nodes?.map((tag, index) => (
-                        <span key={index} className="text-xxs md:text-sm block leading-4 bg-theme-light-gray text-theme-dark px-2 md:px-4 py-1 md:py-2 rounded-md font-normal">
-                            {tag.name}
-                        </span>
-                    ))}
+                    {template.emailTypes?.nodes?.map((tag, index) => {
+                        const isActive = isTagActive(tag.name);
+                        return (
+                            <span
+                                key={index}
+                                className={`text-xxs md:text-sm block leading-4 bg-theme-light-gray text-theme-dark px-2 md:px-4 py-1 md:py-2 rounded-md font-normal${isActive ? ' active-tag' : ''}`}
+                            >
+                                {tag.name}
+                            </span>
+                        );
+                    })}
 
-                    {template.industries?.nodes?.map((tag, index) => (
-                        <span key={index} className="text-xxs md:text-sm block leading-4 bg-theme-light-gray text-theme-dark px-2 md:px-4 py-1 md:py-2 rounded-md font-normal">
-                            {tag.name}
-                        </span>
-                    ))}
+                    {template.industries?.nodes?.map((tag, index) => {
+                        const isActive = isTagActive(tag.name);
+                        return (
+                            <span
+                                key={index}
+                                className={`text-xxs md:text-sm block leading-4 bg-theme-light-gray text-theme-dark px-2 md:px-4 py-1 md:py-2 rounded-md font-normal${isActive ? ' active-tag' : ''}`}
+                            >
+                                {tag.name}
+                            </span>
+                        );
+                    })}
 
-                    {template.seasonals?.nodes?.map((tag, index) => (
-                        <span key={index} className="text-xxs md:text-sm block leading-4 bg-theme-light-gray text-theme-dark px-2 md:px-4 py-1 md:py-2 rounded-md font-normal">
-                            {tag.name}
-                        </span>
-                    ))}
+                    {template.seasonals?.nodes?.map((tag, index) => {
+                        const isActive = isTagActive(tag.name);
+                        return (
+                            <span
+                                key={index}
+                                className={`text-xxs md:text-sm block leading-4 bg-theme-light-gray text-theme-dark px-2 md:px-4 py-1 md:py-2 rounded-md font-normal${isActive ? ' active-tag' : ''}`}
+                            >
+                                {tag.name}
+                            </span>
+                        );
+                    })}
                 </div>
             </div>
         </Link>

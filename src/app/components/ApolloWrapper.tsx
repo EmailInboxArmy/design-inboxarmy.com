@@ -1,10 +1,11 @@
 import { ApolloProvider } from '@apollo/client';
 import { ApolloClient, InMemoryCache } from '@apollo/client';
+import { WORDPRESS_GRAPHQL_ENDPOINT } from '../lib/config';
 
 
 const client = new ApolloClient({
 
-    uri: 'https://staging.project-progress.net/projects/imail/graphql ',
+    uri: WORDPRESS_GRAPHQL_ENDPOINT,
     cache: new InMemoryCache(),
 });
 

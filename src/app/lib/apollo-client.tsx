@@ -1,6 +1,7 @@
 import { ApolloClient, InMemoryCache, HttpLink, from } from '@apollo/client/core'
 import { onError } from '@apollo/client/link/error'
 import fetch from 'cross-fetch'
+import { WORDPRESS_GRAPHQL_ENDPOINT } from '../lib/config';
 
 // Error handling link
 const errorLink = onError(({ graphQLErrors, networkError }) => {
@@ -15,7 +16,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 // HTTP link
 const httpLink = new HttpLink({
-    uri: 'https://staging.project-progress.net/projects/imail/graphql',
+    uri: WORDPRESS_GRAPHQL_ENDPOINT,
     fetch,
 });
 

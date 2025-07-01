@@ -188,7 +188,7 @@ export const ContactForm = () => {
                 console.log(key, value);
             }
 
-            const response = await fetch('https://staging.project-progress.net/projects/imail/wp-json/contact-form-7/v1/contact-forms/112/feedback', {
+            const response = await fetch('https://design-backend.inboxarmy.com/wp-json/contact-form-7/v1/contact-forms/112/feedback', {
                 method: 'POST',
                 body: formPayload,
             });

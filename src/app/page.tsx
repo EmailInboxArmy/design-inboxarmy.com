@@ -117,6 +117,11 @@ export async function generateMetadata(): Promise<Metadata> {
   try {
     const { data } = await client.query({
       query: GET_HOME_PAGE_DATA,
+      context: {
+        fetchOptions: {
+          next: { revalidate: 10 }
+        }
+      }
     });
 
     const seo = data?.page?.seo;
@@ -148,6 +153,11 @@ export default async function Home() {
   try {
     const { data } = await client.query<EmailTemplateData>({
       query: EMAIL_TEMPLATES_QUERY,
+      context: {
+        fetchOptions: {
+          next: { revalidate: 10 }
+        }
+      }
     });
 
     const { adBoxes } = await getBrandData();

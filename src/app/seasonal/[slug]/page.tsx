@@ -74,10 +74,17 @@ const GET_SEASONAL_BY_SLUG = gql`
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
 
   const resolvedParams = await params;
+  let decodedSlug: string;
+  try {
+    decodedSlug = decodeURIComponent(resolvedParams.slug as string);
+  } catch {
+    decodedSlug = resolvedParams.slug as string;
+  }
+
   const { data } = await client.query({
     query: GET_SEASONAL_SEO_BY_SLUG,
     variables: {
-      slug: [resolvedParams.slug],
+      slug: [decodedSlug],
     },
   });
 
@@ -95,10 +102,17 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 }
 export default async function SeasonalPage({ params }: { params: Promise<Params> }) {
   const resolvedParams = await params;
+  let decodedSlug: string;
+  try {
+    decodedSlug = decodeURIComponent(resolvedParams.slug as string);
+  } catch {
+    decodedSlug = resolvedParams.slug as string;
+  }
+
   const { data } = await client.query({
     query: GET_SEASONAL_BY_SLUG,
     variables: {
-      slug: [resolvedParams.slug], // pass slug as array
+      slug: [decodedSlug], // pass slug as array
     },
   });
 
@@ -118,7 +132,7 @@ export default async function SeasonalPage({ params }: { params: Promise<Params>
 
 
   return (
-    <>
+    <div className="page-seasonal">
       <div className="container">
         <div className="text-center py-10 md:py-20 max-w-6xl w-full m-auto">
           <h1 className="leading-tight tracking-tight pb-6 pt-4 md:py-5 block">{seasonalNode?.name} Email Inspiration</h1>
@@ -132,6 +146,7 @@ export default async function SeasonalPage({ params }: { params: Promise<Params>
           hasNextPage={seasonalNode?.posts?.pageInfo.hasNextPage}
           endCursor={seasonalNode?.posts?.pageInfo.endCursor}
           adBoxes={adBoxes}
+          activeTagSlug={decodedSlug}
         />
       </div>
 
@@ -152,6 +167,6 @@ export default async function SeasonalPage({ params }: { params: Promise<Params>
           target: ''
         }
       }} />
-    </>
+    </div>
   );
 }

@@ -37,7 +37,7 @@ export default function Newsletter() {
             formPayload.append('_wpcf7_unit_tag', 'wpcf7-f586-p0-o1');
             formPayload.append('_wpcf7_container_post', '0');
 
-            const response = await fetch('https://staging.project-progress.net/projects/imail/wp-json/contact-form-7/v1/contact-forms/586/feedback', {
+            const response = await fetch('https://design-backend.inboxarmy.com/wp-json/contact-form-7/v1/contact-forms/586/feedback', {
                 method: 'POST',
                 body: formPayload, // Use FormData instead of URLSearchParams
             });
