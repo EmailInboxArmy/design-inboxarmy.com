@@ -114,6 +114,11 @@ export default async function IndustryPage({ params }: { params: Promise<Params>
     variables: {
       slug: [decodedSlug], // pass slug as array
     },
+    context: {
+      fetchOptions: {
+        next: { revalidate: 10 }
+      }
+    }
   });
 
   const industryNode = data.industries?.nodes?.[0];
@@ -132,8 +137,7 @@ export default async function IndustryPage({ params }: { params: Promise<Params>
   }
 
   return (
-    <>
-
+    <div className="page-industry">
       <div className="container">
         <div className="text-center py-10 md:py-20 max-w-6xl w-full m-auto">
           <h1 className="leading-tight tracking-tight pb-6 pt-4 md:py-5 block">{industryNode?.name} Email Inspiration</h1>
@@ -147,6 +151,7 @@ export default async function IndustryPage({ params }: { params: Promise<Params>
           hasNextPage={industryNode?.posts?.pageInfo.hasNextPage}
           endCursor={industryNode?.posts?.pageInfo.endCursor}
           adBoxes={adBoxes}
+          activeTagSlug={decodedSlug}
         />
       </div>
 
@@ -168,6 +173,6 @@ export default async function IndustryPage({ params }: { params: Promise<Params>
           target: ''
         }
       }} />
-    </>
+    </div>
   );
 }

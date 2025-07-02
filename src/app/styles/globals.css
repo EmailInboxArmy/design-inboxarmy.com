@@ -328,6 +328,7 @@ textarea {
   -webkit-transition: all 0.1s ease-in-out;
   transition: all 0.1s ease-in-out;
 }
+
 .email-image {
   padding-bottom: 170%;
 }
@@ -642,4 +643,43 @@ textarea {
 
 .newsletter-form input[type="email"] {
   padding-right: 55px;
+}
+
+.page-email-type .catagery-data span {
+  display: none;
+}
+
+.page-email-type .catagery-data span.active-tag {
+  display: block;
+}
+
+/* Industry page active tag styles */
+.page-industry .catagery-data span {
+  display: none;
+}
+
+.page-industry .catagery-data span.active-tag {
+  display: block;
+}
+
+/* Seasonal page active tag styles */
+.page-seasonal .catagery-data span {
+  display: none;
+}
+
+.page-seasonal .catagery-data span.active-tag {
+  display: block;
+}
+.content-text strong { font-size: 48px; font-weight: 700; display: block; line-height: 1.2; }
+
+@media(max-width: 1300px) {
+  .content-text strong { font-size: 40px;  }
+}
+
+@media(max-width: 767px) {
+  .content-text strong { font-size: 34px;  }
+}
+
+@media(max-width: 640px) {
+  .content-text strong { font-size: 22px;  }
 }

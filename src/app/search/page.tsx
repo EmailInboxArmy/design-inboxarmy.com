@@ -54,6 +54,11 @@ export default async function SearchPage(props: PageProps) {
             query: SEARCH_POSTS,
             variables: { search: keyword },
             errorPolicy: 'all',
+            context: {
+                fetchOptions: {
+                    next: { revalidate: 10 }
+                }
+            }
         });
 
         console.log('Primary search response:', { data, errors }); // Debug log

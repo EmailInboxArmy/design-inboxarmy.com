@@ -17,7 +17,7 @@ query AboutPage {
       heroHeading
       heroContent
       videoHeading
-      videoContent
+      videoText
       videoUrl
       videoImage {
         node {
@@ -30,7 +30,7 @@ query AboutPage {
 `;
 
 export async function aboutdata() {
-  const { data } = await client.query({ query: ABOUT_US_QUERY });
+  const { data } = await client.query({ query: ABOUT_US_QUERY, fetchPolicy: 'network-only' });
 
   return {
     aboutpages: data?.page?.aboutUs ?? {},

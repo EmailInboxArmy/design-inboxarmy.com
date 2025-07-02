@@ -1,9 +1,37 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // No 'rules' here!
+  // Enable experimental features for better SSR
+  // experimental: {
+  //   // Improve server components stability
+  //   serverComponentsExternalPackages: ['@apollo/client'],
+  // },
+
+  serverExternalPackages: ['@apollo/client'],
+
+  // Configure images
   images: {
-    domains: ['staging.project-progress.net'],
+    domains: ['design-backend.inboxarmy.com'],
+  },
+
+  // Add build-time optimizations
+  compiler: {
+    // Remove console logs in production
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+
+  // Add webpack configuration for better error handling
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // Add fallbacks for server-side rendering
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
+    return config;
   },
 };
 

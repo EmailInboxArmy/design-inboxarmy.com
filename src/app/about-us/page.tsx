@@ -20,6 +20,13 @@ import { ABOUT_US_QUERY } from './about-queries';
 export async function generateMetadata(): Promise<Metadata> {
     const { data } = await client.query({
         query: ABOUT_US_QUERY,
+        fetchPolicy: 'network-only',
+        context: {
+            fetchOptions: {
+                next: { revalidate: 10 }
+            }
+            
+        }
     });
 
     const seo = data?.page?.seo;

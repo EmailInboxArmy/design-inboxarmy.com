@@ -50,6 +50,7 @@ interface InfiniteScrollTemplatesProps {
     hasNextPage: boolean;
     endCursor: string;
     adBoxes: AdBox[];
+    activeTagSlug?: string;
 }
 
 // AdCard component for rendering individual ads
@@ -69,7 +70,9 @@ function AdCard({ adBox }: { adBox: AdBox }) {
                     alt="Brand Logo"
                 />
                 <div className="px-4 2xl:px-6 mt-12 md:mt-8 2xl:mt-16">
-                    <p className="h3 text-white 2xl:mb-2">{adBox.title}</p>
+                    <div className=" 2xl:mb-2">
+                        <p className="content-text h3 text-white" dangerouslySetInnerHTML={{ __html: adBox.title }}></p>
+                    </div>
                 </div>
             </div>
 
@@ -86,7 +89,8 @@ export default function InfiniteScrollTemplates({
     initialTemplates,
     hasNextPage: initialHasNextPage,
     endCursor: initialEndCursor,
-    adBoxes
+    adBoxes,
+    activeTagSlug
 }: InfiniteScrollTemplatesProps) {
     const [templates, setTemplates] = useState<Template[]>(initialTemplates);
     const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
@@ -152,6 +156,7 @@ export default function InfiniteScrollTemplates({
                         industries: { nodes: { name: string }[] };
                         seasonals: { nodes: { name: string }[] };
                     }}
+                    activeTagSlug={activeTagSlug}
                 />
             );
 
