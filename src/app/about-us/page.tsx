@@ -16,76 +16,98 @@ import { Metadata } from 'next';
 import { client } from 'app/lib/apollo-client';
 import { ABOUT_US_QUERY } from './about-queries';
 
+// Force dynamic rendering to prevent build-time GraphQL calls
+export const dynamic = 'force-dynamic';
+
 
 export async function generateMetadata(): Promise<Metadata> {
-    const { data } = await client.query({
-        query: ABOUT_US_QUERY,
-        fetchPolicy: 'network-only',
-        context: {
-            fetchOptions: {
-                next: { revalidate: 10 }
+    try {
+        const { data } = await client.query({
+            query: ABOUT_US_QUERY,
+            fetchPolicy: 'network-only',
+            context: {
+                fetchOptions: {
+                    next: { revalidate: 10 }
+                }
+
             }
-            
-        }
-    });
+        });
 
-    const seo = data?.page?.seo;
+        const seo = data?.page?.seo;
 
-    return {
-        title: seo?.title || 'About Us',
-        description: seo?.metaDesc || '',
-        openGraph: {
-            title: seo?.opengraphTitle || seo?.title || 'About Us',
-            description: seo?.opengraphDescription || seo?.metaDesc || '',
-            images: seo?.opengraphImage?.sourceUrl ? [seo.opengraphImage.sourceUrl] : [],
-        },
-    };
+        return {
+            title: seo?.title || 'About Us',
+            description: seo?.metaDesc || '',
+            openGraph: {
+                title: seo?.opengraphTitle || seo?.title || 'About Us',
+                description: seo?.opengraphDescription || seo?.metaDesc || '',
+                images: seo?.opengraphImage?.sourceUrl ? [seo.opengraphImage.sourceUrl] : [],
+            },
+        };
+    } catch (error) {
+        console.error('Error generating about-us metadata:', error);
+        return {
+            title: 'About Us',
+            description: 'Learn more about our company and services',
+        };
+    }
 }
 
 export default async function AboutUs() {
-    const { counterData } = await getCounterData();
-    const emailServices = await fetchEmailServicesData();
-    const testimonials = await getTestimonialsData();
+    try {
+        const { counterData } = await getCounterData();
+        const emailServices = await fetchEmailServicesData();
+        const testimonials = await getTestimonialsData();
 
-    return (
-        <>
-            <span className='block absolute top-0 left-0 w-full h-[112%] md:h-[2462px] bg-gradient-to-b from-[#E9EFE9]'></span>
+        return (
+            <>
+                <span className='block absolute top-0 left-0 w-full h-[112%] md:h-[2462px] bg-gradient-to-b from-[#E9EFE9]'></span>
 
-            <HeroTitle />
+                <HeroTitle />
 
-            <VideoScottCohen />
+                <VideoScottCohen />
 
-            <Gallery />
+                <Gallery />
 
-            <Counter counterData={counterData} />
+                <Counter counterData={counterData} />
 
-            <Awarded />
+                <Awarded />
 
-            <EmailService emailServices={emailServices} />
+                <EmailService emailServices={emailServices} />
 
-            <Brands />
+                <Brands />
 
-            <Industries />
+                <Industries />
 
-            <Testimonials testimonials={testimonials.testimonials} testimonialHeading={testimonials.testimonialHeading} />
+                <Testimonials testimonials={testimonials.testimonials} testimonialHeading={testimonials.testimonialHeading} />
 
-            <MarketingAgency marketingAgency={{
-                title: '',
-                subText: '',
-                textArea: '',
-                servicesInformation: [],
-                logo: {
-                    node: {
-                        sourceUrl: ''
-                    }
-                },
-                ratingArea: [],
-                link: {
-                    url: '',
+                <MarketingAgency marketingAgency={{
                     title: '',
-                    target: ''
-                }
-            }} />
-        </>
-    )
+                    subText: '',
+                    textArea: '',
+                    servicesInformation: [],
+                    logo: {
+                        node: {
+                            sourceUrl: ''
+                        }
+                    },
+                    ratingArea: [],
+                    link: {
+                        url: '',
+                        title: '',
+                        target: ''
+                    }
+                }} />
+            </>
+        )
+    } catch (error) {
+        console.error('Error loading about-us data:', error);
+        return (
+            <div className="container py-20">
+                <div className="text-center text-3xl text-red-500 font-bold">
+                    Unable to load about-us data at this time
+                </div>
+            </div>
+        );
+    }
 }

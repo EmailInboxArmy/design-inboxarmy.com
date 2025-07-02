@@ -611,6 +611,11 @@ textarea {
   padding-bottom: 24px;
 }
 
+.email-service-section p strong,
+.email-service-section p {
+    font-size: 18px;
+}
+
 .info-text p {
   color: #ffffff;
   font-size: 22px;
@@ -678,6 +683,7 @@ textarea {
 
 @media(max-width: 767px) {
   .content-text strong { font-size: 34px;  }
+  .video-text { font-size: 16px; }
 }
 
 @media(max-width: 640px) {
