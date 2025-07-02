@@ -25,6 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
             fetchOptions: {
                 next: { revalidate: 10 }
             }
+            
         }
     });
 

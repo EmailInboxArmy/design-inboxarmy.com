@@ -78,7 +78,7 @@ const EMAIL_TEMPLATES_QUERY = gql`
         uri
         featuredImage {
           node {
-            sourceUrl(size: CUSTOM_300X600)
+            sourceUrl
           }
         }      
         emailTypes(first: 1) {
