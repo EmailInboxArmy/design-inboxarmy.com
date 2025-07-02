@@ -7,6 +7,9 @@ import { Params } from 'next/dist/server/request/params';
 import { getBrandData } from '../../lib/queries';
 import { Metadata } from 'next';
 
+// Force dynamic rendering to prevent build-time GraphQL calls
+export const dynamic = 'force-dynamic';
+
 const GET_EMAIL_TYPE_SEO_BY_SLUG = gql`
 query EmailTemplate($slug: [String]) {
     emailTypes(where: { slug: $slug }) {

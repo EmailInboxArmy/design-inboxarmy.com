@@ -154,12 +154,21 @@ const GET_MENUDATA_QUERY = gql`
 `;
 
 export async function postdata() {
-  const { data } = await client.query({ query: GET_MENUDATA_QUERY });
-  return {
-    emailTypes: data?.emailTypes?.nodes ?? [],
-    seasonals: data?.seasonals?.nodes ?? [],
-    industries: data?.industries?.nodes ?? [],
-  };
+  try {
+    const { data } = await client.query({ query: GET_MENUDATA_QUERY });
+    return {
+      emailTypes: data?.emailTypes?.nodes ?? [],
+      seasonals: data?.seasonals?.nodes ?? [],
+      industries: data?.industries?.nodes ?? [],
+    };
+  } catch (error) {
+    console.error('Error fetching post data:', error);
+    return {
+      emailTypes: [],
+      seasonals: [],
+      industries: [],
+    };
+  }
 }
 
 export const GET_BRAND_QUERY = gql`
@@ -185,10 +194,17 @@ export const GET_BRAND_QUERY = gql`
 `;
 
 export async function getBrandData() {
-  const { data } = await client.query({ query: GET_BRAND_QUERY });
-  return {
-    adBoxes: data?.themeoptions?.globaldata?.adBoxes ?? [],
-  };
+  try {
+    const { data } = await client.query({ query: GET_BRAND_QUERY });
+    return {
+      adBoxes: data?.themeoptions?.globaldata?.adBoxes ?? [],
+    };
+  } catch (error) {
+    console.error('Error fetching brand data:', error);
+    return {
+      adBoxes: [],
+    };
+  }
 }
 
 export const GET_BRANDS_QUERY = gql`
@@ -224,10 +240,17 @@ export const GET_BRANDS_QUERY = gql`
 `;
 
 export async function getBrandsData() {
-  const { data } = await client.query({ query: GET_BRANDS_QUERY });
-  return {
-    brands: data?.brands?.nodes ?? [],
-  };
+  try {
+    const { data } = await client.query({ query: GET_BRANDS_QUERY });
+    return {
+      brands: data?.brands?.nodes ?? [],
+    };
+  } catch (error) {
+    console.error('Error fetching brands data:', error);
+    return {
+      brands: [],
+    };
+  }
 }
 
 export const GET_BRAND_PAGE_QUERY = gql`
@@ -243,10 +266,17 @@ query BrandPage {
 }
 `;
 export async function getBrandPageData() {
-  const { data } = await client.query({ query: GET_BRAND_PAGE_QUERY });
-  return {
-    brandPage: data?.pages?.nodes?.[0]?.brandPage ?? [],
-  };
+  try {
+    const { data } = await client.query({ query: GET_BRAND_PAGE_QUERY });
+    return {
+      brandPage: data?.pages?.nodes?.[0]?.brandPage ?? [],
+    };
+  } catch (error) {
+    console.error('Error fetching brand page data:', error);
+    return {
+      brandPage: [],
+    };
+  }
 }
 
 
@@ -262,8 +292,15 @@ query BrandsData {
 `;
 
 export async function getBrandCategoriesData() {
-  const { data } = await client.query({ query: GET_BRAND_CATEGORIES_QUERY });
-  return {
-    brandCategories: data?.brandCategories?.nodes ?? [],
-  };
+  try {
+    const { data } = await client.query({ query: GET_BRAND_CATEGORIES_QUERY });
+    return {
+      brandCategories: data?.brandCategories?.nodes ?? [],
+    };
+  } catch (error) {
+    console.error('Error fetching brand categories data:', error);
+    return {
+      brandCategories: [],
+    };
+  }
 }

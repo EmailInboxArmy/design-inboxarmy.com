@@ -5,7 +5,6 @@ import './styles/globals.css';
 import Header from './components/header.jsx';
 import Footer from './components/footer.jsx';
 import GlobalLoader from './components/GlobalLoader';
-import Script from 'next/script';
 import { client } from './lib/apollo-client';
 import { gql } from '@apollo/client';
 import BodyClassHandler from './components/BodyClassHandler';
@@ -81,12 +80,6 @@ export default async function RootLayout({
         <Header />
         {children}
         <Footer />
-        {/* BugHerd Script */}
-        <Script
-          src="https://www.bugherd.com/sidebarv2.js?apikey=vfmlojxzuzzx1k3puoexfq "
-          strategy="afterInteractive"
-          async
-        />
       </body>
     </html>
   );

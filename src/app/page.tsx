@@ -112,15 +112,13 @@ const EMAIL_TEMPLATES_QUERY = gql`
   }
 `;
 
+export const revalidate = 10;
+
 export async function generateMetadata(): Promise<Metadata> {
   try {
     const { data } = await client.query({
       query: GET_HOME_PAGE_DATA,
-      context: {
-        fetchOptions: {
-          next: { revalidate: 10 }
-        }
-      }
+      fetchPolicy: 'no-cache',
     });
 
     const seo = data?.page?.seo;

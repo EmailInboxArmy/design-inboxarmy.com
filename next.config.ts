@@ -20,6 +20,13 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
 
+  // Disable static generation for problematic pages
+  experimental: {
+    // This will make pages render on-demand instead of at build time
+    workerThreads: false,
+    cpus: 1,
+  },
+
   // Add webpack configuration for better error handling
   webpack: (config, { isServer }) => {
     if (isServer) {
