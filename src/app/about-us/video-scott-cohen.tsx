@@ -6,7 +6,7 @@ import PlayIcon from '../images/video-play.png';
 
 interface Post {
     videoHeading: string;
-    videoContent: string;
+    videoText: string;
     videoUrl: string;
     videoImage: {
         node: {
@@ -26,7 +26,7 @@ export default function VideoScottCohen({ aboutpages }: VideoScottCohenProps) {
     // Check if all content is empty
     if (!aboutpages ||
         (!aboutpages.videoHeading &&
-            !aboutpages.videoContent &&
+            !aboutpages.videoText &&
             !aboutpages.videoUrl &&
             !aboutpages.videoImage?.node?.sourceUrl)) {
         return null;
@@ -41,10 +41,10 @@ export default function VideoScottCohen({ aboutpages }: VideoScottCohenProps) {
                             {aboutpages.videoHeading && (
                                 <h2>{aboutpages.videoHeading}</h2>
                             )}
-                            {aboutpages.videoContent && (
+                            {aboutpages.videoText && (
                                 <div
-                                    className="content-text"
-                                    dangerouslySetInnerHTML={{ __html: aboutpages.videoContent }}
+                                    className="content-text video-text"
+                                    dangerouslySetInnerHTML={{ __html: aboutpages.videoText }}
                                 ></div>
                             )}
                         </div>

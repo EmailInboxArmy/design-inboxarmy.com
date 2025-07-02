@@ -39,7 +39,6 @@ export default function EmailCard({
         const tagSlug = tagName.toLowerCase().replace(/\s+/g, '-');
         return activeTagSlug === tagSlug;
     };
-    console.log(image);
 
     return (
         <Link href={`/${slug}`} className="email-link w-full bg-white shadow-custom rounded-md md:rounded-xl border border-solid border-theme-border overflow-hidden">

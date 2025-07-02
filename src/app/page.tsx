@@ -71,15 +71,14 @@ query HomePage {
 
 const EMAIL_TEMPLATES_QUERY = gql`
   query EmailTemplate($after: String) {
-    posts(first: 11, after: $after) {
-     
+    posts(first: 11, after: $after) {     
       nodes {
         title
         slug
         uri
         featuredImage {
           node {
-            sourceUrl
+            sourceUrl(size: CUSTOM_300X600)
           }
         }      
         emailTypes(first: 1) {

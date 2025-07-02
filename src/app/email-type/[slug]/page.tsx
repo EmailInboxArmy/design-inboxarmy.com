@@ -113,6 +113,11 @@ export default async function EmailTypePage({ params }: { params: Promise<Params
     variables: {
       slug: [decodedSlug], // pass slug as array
     },
+    context: {
+      fetchOptions: {
+        next: { revalidate: 10 }
+      }
+    }
   });
 
   const emailTypeNode = data.emailTypes?.nodes?.[0];

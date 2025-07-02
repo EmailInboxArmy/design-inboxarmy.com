@@ -17,52 +17,52 @@ import EmailShadowPreview from './ShowEmail';
 const POST_QUERY = gql`
   query GetPost($slug: ID!) {
     post(id: $slug, idType: SLUG) {
-      title
-      content(format: RENDERED)
-      date
-      featuredImage {
-        node {
-          sourceUrl
-          altText
+        title
+        date
+        postdata {
+            content
+            brand {
+                nodes {
+                ... on Brand {
+                    id
+                    title
+                    slug
+                    featuredImage {
+                    node {
+                        sourceUrl
+                    }
+                    }
+                }
+                }
+            }
         }
-      }
-      emailTypes(first: 30) {
-        nodes {
-          id
-          name
-          slug
+        featuredImage {
+            node {
+            sourceUrl
+            altText
+            }
         }
-      }
-      industries(first: 30) {
-        nodes {
-          id
-          name
-          slug
-        }
-      }
-      seasonals(first: 30) {
-        nodes {
-          id
-          name
-          slug
-        }
-      }
-      brandposts {
-        brand {
+        emailTypes(first: 30) {
             nodes {
-            ... on Brand {
-                id
-                title
-                slug
-                featuredImage {
-                node {
-                    sourceUrl
-                }
-                }
-            }
+            id
+            name
+            slug
             }
         }
-      }
+        industries(first: 30) {
+            nodes {
+            id
+            name
+            slug
+            }
+        }
+        seasonals(first: 30) {
+            nodes {
+            id
+            name
+            slug
+            }
+        }
     }
   }
 `;
@@ -73,7 +73,6 @@ const POSTS_QUERY = gql`
     posts(where: { name: $slug }, first: 1) {
       nodes {
         title
-        content(format: RENDERED)
         date
         featuredImage {
           node {
@@ -102,7 +101,8 @@ const POSTS_QUERY = gql`
             slug
           }
         }
-        brandposts {
+        postdata {
+          content
           brand {
               nodes {
               ... on Brand {
@@ -181,7 +181,7 @@ export async function generateMetadata({ params }) {
 
         return {
             title: post.title,
-            description: post.content?.slice(0, 160),
+            description: post.postdata?.content?.slice(0, 160),
         };
     } catch (error) {
         return {
@@ -250,7 +250,7 @@ export default async function PostDetail({ params }) {
         console.log('Final post data:', post);
 
         // Check if post exists and has required data
-        if (!post || !post.title || !post.content) {
+        if (!post || !post.title || !post.postdata?.content) {
             console.log('Post not found or invalid for slug:', decodedSlug);
             notFound();
         }
@@ -261,7 +261,7 @@ export default async function PostDetail({ params }) {
             notFound();
         }
 
-        if (typeof post.content !== 'string' || post.content.trim() === '') {
+        if (typeof post.postdata?.content !== 'string' || post.postdata.content.trim() === '') {
             console.log('Post content is empty or invalid for slug:', decodedSlug);
             notFound();
         }
@@ -340,17 +340,17 @@ export default async function PostDetail({ params }) {
                                                                 <span className="pl-1 md:pl-2 font-medium">Download</span>
                                                             </a>
                                                         )}
-                                                        
-                                                        
+
+
                                                     </div>
                                                 </div>
                                             </header>
 
                                             <div className="email-content-area rounded-b-2xl border border-solid border-theme-border md:p-8 xl:p-16 min-h-screen">
                                                 <div className='email-postdata bg-white'>
-                                                    <EmailShadowPreview html={post.content} />
+                                                    <EmailShadowPreview html={post.postdata.content} />
                                                 </div>
-                                                <CodeView content={post.content} />
+                                                <CodeView content={post.postdata.content} />
                                             </div>
                                         </div>
                                     </div>
@@ -358,13 +358,13 @@ export default async function PostDetail({ params }) {
                                     <div className='w-full xl:w-2/5 xl:pl-16 xl:sticky xl:top-[100px] order-1 xl:order-2 mb-10 xl:mb-0'>
                                         <div className='bg-white px-6 py-8 md:p-8 w-full md:rounded-2xl space-y-4'>
 
-                                            {post.brandposts?.brand?.nodes?.[0] && (
+                                            {post.postdata?.brand?.nodes?.[0] && (
                                                 <div className="flex items-center space-x-4">
                                                     <div className="w-20 md:w-24 h-20 md:h-24 rounded-full overflow-hidden border border-solid border-theme-border flex items-center justify-center">
-                                                        {post.brandposts.brand.nodes[0].featuredImage?.node?.sourceUrl ? (
+                                                        {post.postdata.brand.nodes[0].featuredImage?.node?.sourceUrl ? (
                                                             <Image
-                                                                src={post.brandposts.brand.nodes[0].featuredImage.node.sourceUrl}
-                                                                alt={post.brandposts.brand.nodes[0].title || 'Brand logo'}
+                                                                src={post.postdata.brand.nodes[0].featuredImage.node.sourceUrl}
+                                                                alt={post.postdata.brand.nodes[0].title || 'Brand logo'}
                                                                 width={96}
                                                                 height={96}
                                                                 className="w-full h-full object-cover"
@@ -376,7 +376,7 @@ export default async function PostDetail({ params }) {
                                                         )}
                                                     </div>
                                                     <h1>
-                                                        <Link className="text-2xl font-bold block" href={`/brands/${post.brandposts.brand.nodes[0].slug}`}>{post.brandposts.brand.nodes[0].title}</Link>
+                                                        <Link className="text-2xl font-bold block" href={`/brands/${post.postdata.brand.nodes[0].slug}`}>{post.postdata.brand.nodes[0].title}</Link>
                                                     </h1>
                                                 </div>
                                             )}

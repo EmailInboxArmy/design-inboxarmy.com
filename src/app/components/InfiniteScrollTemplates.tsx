@@ -70,8 +70,8 @@ function AdCard({ adBox }: { adBox: AdBox }) {
                     alt="Brand Logo"
                 />
                 <div className="px-4 2xl:px-6 mt-12 md:mt-8 2xl:mt-16">
-                    <div className="h3 text-white 2xl:mb-2">
-                        <span className="content-text" dangerouslySetInnerHTML={{ __html: adBox.title }}></span>
+                    <div className=" 2xl:mb-2">
+                        <p className="content-text h3 text-white" dangerouslySetInnerHTML={{ __html: adBox.title }}></p>
                     </div>
                 </div>
             </div>

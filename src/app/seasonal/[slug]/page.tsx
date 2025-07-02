@@ -41,7 +41,7 @@ const GET_SEASONAL_BY_SLUG = gql`
             uri
             featuredImage {
               node {
-                sourceUrl
+                sourceUrl(size: CUSTOM_300X600)
               }
             }
             emailTypes {
@@ -86,6 +86,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     variables: {
       slug: [decodedSlug],
     },
+    context: {
+      fetchOptions: {
+        next: { revalidate: 10 }
+      }
+    }
   });
 
   const seo = data?.seasonals?.nodes?.[0]?.seo;
@@ -114,6 +119,11 @@ export default async function SeasonalPage({ params }: { params: Promise<Params>
     variables: {
       slug: [decodedSlug], // pass slug as array
     },
+    context: {
+      fetchOptions: {
+        next: { revalidate: 10 }
+      }
+    }
   });
 
   const seasonalNode = data.seasonals?.nodes?.[0];

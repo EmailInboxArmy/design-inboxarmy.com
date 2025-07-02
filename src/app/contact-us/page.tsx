@@ -97,6 +97,11 @@ export default async function ContactUs() {
     const testimonials = await getTestimonialsData();
     const { data } = await client.query({
         query: GET_CONTACT_PAGE_DATA,
+        context: {
+            fetchOptions: {
+                next: { revalidate: 10 }
+            }
+        }
     });
 
     const contactData = data?.page?.contactUs;

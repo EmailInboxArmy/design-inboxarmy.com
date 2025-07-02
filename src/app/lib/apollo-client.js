@@ -6,6 +6,7 @@ export const client = new ApolloClient({
     link: new HttpLink({
         uri: WORDPRESS_GRAPHQL_ENDPOINT,
         fetch,
+        credentials: 'same-origin'
     }),
     cache: new InMemoryCache(),
 });

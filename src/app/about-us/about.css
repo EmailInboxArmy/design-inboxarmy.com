@@ -17,11 +17,14 @@
 .gallery-wrapper .image-box:nth-child(5) {
     grid-column: span 2;
 }
-
+.video-text { font-size: 22px; line-height: 1.4; }
 .image-box {
     box-shadow: -15px 10px 0 var(--theme-dark);
 }
-
+.content-text p strong,
+.content-text p {
+    font-size: 18px;
+}
 .content-text p {
     padding-bottom: 32px;
 }
@@ -233,6 +236,7 @@
         max-width: 80px;
         max-height: 100px;
     }
+    .video-text { font-size: 16px; }
 
 
 
