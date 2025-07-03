@@ -113,6 +113,7 @@ export default async function IndustryPage({ params }: { params: Promise<Params>
 
   const { data } = await client.query({
     query: GET_INDUSTRY_WITH_POSTS,
+    fetchPolicy: 'no-cache',
     variables: {
       slug: [decodedSlug], // pass slug as array
     },

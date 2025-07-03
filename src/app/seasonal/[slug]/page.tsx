@@ -85,6 +85,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   const { data } = await client.query({
     query: GET_SEASONAL_SEO_BY_SLUG,
+    fetchPolicy: 'no-cache',
     variables: {
       slug: [decodedSlug],
     },

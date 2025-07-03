@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from 'react';
 import { useInView } from 'react-intersection-observer';
 import Image from 'next/image';
 import Link from 'next/link';
-import Willow from '../images/willow.jpg';
 
 interface Brand {
     featuredImage?: {
@@ -23,11 +22,16 @@ interface Brand {
     };
 }
 
+interface BrandCategory {
+    name: string;
+    slug: string;
+}
+
 interface InfiniteScrollBrandsProps {
     initialBrands: Brand[];
     hasNextPage: boolean;
     endCursor: string;
-    brandCategories: Array<{ name: string; slug: string }>;
+    brandCategories: BrandCategory[];
 }
 
 export default function InfiniteScrollBrands({
@@ -51,7 +55,7 @@ export default function InfiniteScrollBrands({
 
     useEffect(() => {
         const loadMoreBrands = async () => {
-            if (inView && hasNextPage && !isLoading && !searchTerm.trim()) {
+            if (inView && hasNextPage && !isLoading && !searchTerm.trim() && !selectedCategory) {
                 setIsLoading(true);
                 try {
                     const response = await fetch('/api/brands', {
@@ -84,34 +88,51 @@ export default function InfiniteScrollBrands({
         };
 
         loadMoreBrands();
-    }, [inView, hasNextPage, endCursor, isLoading, searchTerm]);
+    }, [inView, hasNextPage, endCursor, isLoading, searchTerm, selectedCategory]);
 
-    // Function to perform search - client side filtering
+    // Function to perform search - server side search
     const performSearch = useCallback(async (search: string) => {
-        console.log('Performing search for:', search);
-        console.log('Initial brands count:', initialBrands.length);
+        console.log('Performing server-side search for:', search);
 
         setIsSearching(true);
         setIsLoading(true);
         try {
-            // For now, we'll search through the initial brands only
-            // In a real implementation, you'd want to load more brands or implement server-side search
-            const filteredBrands = initialBrands.filter((brand: Brand) =>
-                brand.title.toLowerCase().includes(search.toLowerCase())
-            );
+            const response = await fetch('/api/brands/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    search: search.trim(),
+                }),
+            });
 
-            console.log('Filtered brands count:', filteredBrands.length);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
-            setBrands(filteredBrands);
-            setHasNextPage(false); // No more pages for search results
-            setEndCursor('');
+            const data = await response.json();
+
+            if (data.brands) {
+                console.log('Search results count:', data.brands.nodes.length);
+                setBrands(data.brands.nodes);
+                setHasNextPage(false); // No pagination for search results
+                setEndCursor('');
+            } else {
+                setBrands([]);
+                setHasNextPage(false);
+                setEndCursor('');
+            }
         } catch (error) {
             console.error('Error searching brands:', error);
+            setBrands([]);
+            setHasNextPage(false);
+            setEndCursor('');
         } finally {
             setIsLoading(false);
             setIsSearching(false);
         }
-    }, [initialBrands]);
+    }, []);
 
     // Debounced search effect
     useEffect(() => {
@@ -130,25 +151,41 @@ export default function InfiniteScrollBrands({
         return () => clearTimeout(timeoutId);
     }, [searchTerm, initialBrands, initialHasNextPage, initialEndCursor, performSearch]);
 
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         setSearchTerm(e.target.value);
     };
 
-    const handleSearchSubmit = (e: React.FormEvent) => {
+    const handleSearchSubmit = (e: React.FormEvent): void => {
         e.preventDefault();
         if (searchTerm.trim()) {
             performSearch(searchTerm.trim());
+        } else {
+            // Reset to initial state if search is cleared
+            setBrands(initialBrands);
+            setHasNextPage(initialHasNextPage);
+            setEndCursor(initialEndCursor);
+            setIsSearching(false);
         }
     };
 
-    const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedCategory(e.target.value);
+    const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
+        const newCategory = e.target.value;
+        setSelectedCategory(newCategory);
+
+        // If a category is selected, reset search and show all brands
+        if (newCategory) {
+            setSearchTerm('');
+            setBrands(initialBrands);
+            setHasNextPage(initialHasNextPage);
+            setEndCursor(initialEndCursor);
+            setIsSearching(false);
+        }
     };
 
-    // Filter brands by category on client side
+    // Filter brands by category on client side (applied to current brands state)
     const filteredBrands = selectedCategory
-        ? brands.filter(brand =>
-            brand.brandCategories?.nodes?.some(category => category.slug === selectedCategory)
+        ? brands.filter((brand: Brand) =>
+            brand.brandCategories?.nodes?.some((category: { name: string; slug: string }) => category.slug === selectedCategory)
         )
         : brands;
 
@@ -206,14 +243,18 @@ export default function InfiniteScrollBrands({
                     <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-2 gap-y-4 md:gap-6 lg:gap-9 lg:px-10'>
                         {filteredBrands.map((brand: Brand, index: number) => (
                             <Link key={`${brand.slug}-${index}`} href={`/brands/${brand.slug}`} className="bg-white rounded-2xl shadow-md py-8 px-6 flex flex-col items-center border border-solid border-theme-border origin-center transition-all ease-in-out lg:hover:scale-105">
-                                <div className="w-28 lg:w-[150px] h-28 lg:h-[150px] rounded-full overflow-hidden flex items-center justify-center">
-                                    <Image
-                                        className='w-full h-full object-cover'
-                                        src={brand.featuredImage?.node?.sourceUrl || Willow}
-                                        alt={brand.featuredImage?.node?.altText || brand.title || "Brand Image"}
-                                        width={150}
-                                        height={150}
-                                    />
+                                <div className="w-28 lg:w-[150px] h-28 lg:h-[150px] rounded-full overflow-hidden flex items-center justify-center bg-gray-200 text-gray-700 text-3xl font-bold">
+                                    {brand.featuredImage?.node?.sourceUrl ? (
+                                        <Image
+                                            className="w-full h-full object-cover"
+                                            src={brand.featuredImage.node.sourceUrl}
+                                            alt={brand.featuredImage.node.altText || brand.title || "Brand Image"}
+                                            width={150}
+                                            height={150}
+                                        />
+                                    ) : (
+                                        brand.title?.charAt(0).toUpperCase() || '?'
+                                    )}
                                 </div>
                                 <p className="mt-4 text-base md:text-lg font-semibold text-[#2E2B29]">{brand.title}</p>
                             </Link>

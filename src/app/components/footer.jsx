@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { client } from '../lib/apollo-client'
 import { gql } from '@apollo/client'
 
+// import footerLogo from '../images/inboxarmy-logo.svg';
+
 import Newsletter from './newsletter';
 
 export async function footerdata() {

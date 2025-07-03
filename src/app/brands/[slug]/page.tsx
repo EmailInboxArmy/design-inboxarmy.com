@@ -25,7 +25,6 @@ const GET_BRAND_AND_POSTS_QUERY = gql`
       title
       slug
       brands {
-        brandIntroduction
         website
       }
       featuredImage {
@@ -176,11 +175,12 @@ export default async function BrandDetail({ params }: { params: Promise<Params> 
 
                 <div className='w-full md:w-auto md:pl-2'>
                   <h1>{brandInfo.title}</h1>
-                  {brandInfo.brands.brandIntroduction && (
+                  
                     <p className="text-base lg:text-1xl text-theme-text-2 mt-4 ">
-                      {brandInfo.brands.brandIntroduction}
+                      A collection of emails built by {brandInfo.title}
+                       
                     </p>
-                  )}
+                  
                 </div>
               </div>
               <div className='w-full md:w-4/12 flex justify-center md:justify-end mt-8 md:mt-0'>

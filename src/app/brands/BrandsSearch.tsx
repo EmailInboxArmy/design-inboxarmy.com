@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import SearchIcon from '../images/search-icon.svg';
-import Willow from '../images/willow.jpg';
 
 interface Brand {
     featuredImage?: {
@@ -103,13 +102,17 @@ export default function BrandsSearch({ brands, brandCategories }: BrandsSearchPr
                         {filteredBrands.map((brand: Brand, index: number) => (
                             <Link key={index} href={`/brands/${brand.slug}`} className="bg-white rounded-2xl shadow-md py-8 px-6  flex flex-col items-center border border-solid border-theme-border origin-center transition-all ease-in-out lg:hover:scale-105">
                                 <div className="w-28 lg:w-[150px] h-28 lg:h-[150px] rounded-full overflow-hidden flex items-center justify-center">
-                                    <Image
-                                        className='w-full h-full object-cover'
-                                        src={brand.featuredImage?.node?.sourceUrl || Willow}
-                                        alt={brand.featuredImage?.node?.altText || brand.title || "Brand Image"}
-                                        width={150}
-                                        height={150}
-                                    />
+                                    {brand.featuredImage?.node?.sourceUrl ? (
+                                        <Image
+                                            className="w-full h-full object-cover"
+                                            src={brand.featuredImage.node.sourceUrl}
+                                            alt={brand.featuredImage.node.altText || brand.title || "Brand Image"}
+                                            width={150}
+                                            height={150}
+                                        />
+                                    ) : (
+                                        brand.title?.charAt(0).toUpperCase() || '?'
+                                    )}
                                 </div>
                                 <p className="mt-4 text-base md:text-lg font-semibold text-[#2E2B29]">{brand.title}</p>
                             </Link>

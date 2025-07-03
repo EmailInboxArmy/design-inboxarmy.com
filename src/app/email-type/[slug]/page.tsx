@@ -115,6 +115,7 @@ export default async function EmailTypePage({ params }: { params: Promise<Params
 
   const { data } = await client.query({
     query: GET_EMAIL_TYPE_BY_SLUG,
+    fetchPolicy: 'no-cache',
     variables: {
       slug: [decodedSlug], // pass slug as array
     },

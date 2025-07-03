@@ -248,7 +248,7 @@ query BrandsData {
 
 export const GET_BRANDS_QUERY = gql`
   query GetBrands($after: String) {
-    brands(first: 30, after: $after) {
+    brands(first: 30, after: $after, where: { orderby: { field: TITLE, order: ASC } }) {
       nodes {
         seo {
           title
@@ -267,7 +267,7 @@ export const GET_BRANDS_QUERY = gql`
         }
         slug
         title
-        brandCategories(first: 10) {
+        brandCategories(first: 50) {
           nodes {
             name
             slug
@@ -302,8 +302,12 @@ export async function getBrandsData(after: string | null = null) {
       query: GET_BRANDS_QUERY,
       variables: { after }
     });
+
+    const brandsData = data?.brands?.nodes ?? [];
+    console.log('Brands data (server-side sorted):', brandsData.map((brand: { title: string; slug: string }) => ({ title: brand.title, slug: brand.slug })));
+
     return {
-      brands: data?.brands?.nodes ?? [],
+      brands: brandsData,
       hasNextPage: data?.brands?.pageInfo?.hasNextPage ?? false,
       endCursor: data?.brands?.pageInfo?.endCursor ?? '',
     };
@@ -316,3 +320,40 @@ export async function getBrandsData(after: string | null = null) {
     };
   }
 }
+
+// // Alternative brands query with different ordering approaches
+// export const GET_BRANDS_ORDERED_QUERY = gql`
+//   query GetBrandsOrdered($after: String) {
+//     brands(first: 30, after: $after, where: { orderby: { field: TITLE, order: ASC } }) {
+//       nodes {
+//         seo {
+//           title
+//           metaDesc
+//           opengraphTitle
+//           opengraphDescription
+//           opengraphImage {
+//             sourceUrl
+//           }
+//         }
+//         featuredImage {
+//           node {
+//             sourceUrl
+//             altText
+//           }
+//         }
+//         slug
+//         title
+//         brandCategories(first: 50) {
+//           nodes {
+//             name
+//             slug
+//           }
+//         }
+//       }
+//       pageInfo {
+//         hasNextPage
+//         endCursor
+//       }
+//     }
+//   }
+// `;
