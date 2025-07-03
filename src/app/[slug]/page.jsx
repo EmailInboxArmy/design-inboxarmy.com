@@ -268,6 +268,12 @@ export default async function PostDetail({ params }) {
 
         const formattedDate = format(new Date(post.date), "MMMM d, yyyy h:mmaaa").toLowerCase();
 
+        // Check if there are any taxonomies available
+        const hasEmailTypes = post.emailTypes?.nodes?.length > 0;
+        const hasIndustries = post.industries?.nodes?.length > 0;
+        const hasSeasonals = post.seasonals?.nodes?.length > 0;
+        const hasAnyTaxonomy = hasEmailTypes || hasIndustries || hasSeasonals;
+
         return (
             <>
                 <BodyClassHandler classname='page-category-detail' />
@@ -408,6 +414,10 @@ export default async function PostDetail({ params }) {
                                                                 {seasonal.name}
                                                             </span>
                                                         ))
+                                                    )}
+
+                                                    {!hasAnyTaxonomy && (
+                                                        <span className="text-base font-medium block leading-4 bg-theme-light-gray-2 text-theme-dark px-4 md:px-4 py-2 md:py-2 rounded-3xl">Other</span>
                                                     )}
                                                 </div>
                                             </div>

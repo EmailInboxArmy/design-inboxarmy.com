@@ -150,11 +150,6 @@ export default async function Home() {
   try {
     const { data } = await client.query<EmailTemplateData>({
       query: EMAIL_TEMPLATES_QUERY,
-      context: {
-        fetchOptions: {
-          next: { revalidate: 10 }
-        }
-      }
     });
 
     const { adBoxes } = await getBrandData();

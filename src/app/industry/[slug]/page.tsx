@@ -100,6 +100,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   };
 }
 
+export const revalidate = 10;   
+
 export default async function IndustryPage({ params }: { params: Promise<Params> }) {
   const resolvedParams = await params;
   let decodedSlug: string;
@@ -114,11 +116,7 @@ export default async function IndustryPage({ params }: { params: Promise<Params>
     variables: {
       slug: [decodedSlug], // pass slug as array
     },
-    context: {
-      fetchOptions: {
-        next: { revalidate: 10 }
-      }
-    }
+   
   });
 
   const industryNode = data.industries?.nodes?.[0];

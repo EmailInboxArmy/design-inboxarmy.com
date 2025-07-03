@@ -25,12 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
         const { data } = await client.query({
             query: ABOUT_US_QUERY,
             fetchPolicy: 'network-only',
-            context: {
-                fetchOptions: {
-                    next: { revalidate: 10 }
-                }
-
-            }
+           
         });
 
         const seo = data?.page?.seo;
@@ -52,6 +47,8 @@ export async function generateMetadata(): Promise<Metadata> {
         };
     }
 }
+
+export const revalidate = 10;   
 
 export default async function AboutUs() {
     try {

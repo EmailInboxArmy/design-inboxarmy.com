@@ -8,7 +8,7 @@ export const SEARCH_POSTS = gql`
         search: $search,
         orderby: { field: DATE, order: DESC }
       },
-      first: 500
+      first: 1000
     ) {
       nodes {
         id
@@ -56,7 +56,7 @@ export const SEARCH_POSTS_ALT = gql`
       where: { 
         search: $search
       },
-      first: 50
+      first: 1000
     ) {
       nodes {
         id
@@ -207,51 +207,6 @@ export async function getBrandData() {
   }
 }
 
-export const GET_BRANDS_QUERY = gql`
-  query BrandsData {
-    brands(first: 10000)  {
-      nodes {
-        seo {
-          title
-          metaDesc
-          opengraphTitle
-          opengraphDescription
-          opengraphImage {
-            sourceUrl
-          }
-        }
-        featuredImage {
-            node {
-              sourceUrl
-              altText
-            }
-          }
-          slug
-          title
-          brandCategories {
-            nodes {
-              name
-              slug
-            }
-          }
-        }
-      }
-  }
-`;
-
-export async function getBrandsData() {
-  try {
-    const { data } = await client.query({ query: GET_BRANDS_QUERY });
-    return {
-      brands: data?.brands?.nodes ?? [],
-    };
-  } catch (error) {
-    console.error('Error fetching brands data:', error);
-    return {
-      brands: [],
-    };
-  }
-}
 
 export const GET_BRAND_PAGE_QUERY = gql`
 query BrandPage {
@@ -291,6 +246,42 @@ query BrandsData {
 }
 `;
 
+export const GET_BRANDS_QUERY = gql`
+  query GetBrands($after: String) {
+    brands(first: 30, after: $after) {
+      nodes {
+        seo {
+          title
+          metaDesc
+          opengraphTitle
+          opengraphDescription
+          opengraphImage {
+            sourceUrl
+          }
+        }
+        featuredImage {
+          node {
+            sourceUrl
+            altText
+          }
+        }
+        slug
+        title
+        brandCategories(first: 10) {
+          nodes {
+            name
+            slug
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
 export async function getBrandCategoriesData() {
   try {
     const { data } = await client.query({ query: GET_BRAND_CATEGORIES_QUERY });
@@ -301,6 +292,27 @@ export async function getBrandCategoriesData() {
     console.error('Error fetching brand categories data:', error);
     return {
       brandCategories: [],
+    };
+  }
+}
+
+export async function getBrandsData(after: string | null = null) {
+  try {
+    const { data } = await client.query({
+      query: GET_BRANDS_QUERY,
+      variables: { after }
+    });
+    return {
+      brands: data?.brands?.nodes ?? [],
+      hasNextPage: data?.brands?.pageInfo?.hasNextPage ?? false,
+      endCursor: data?.brands?.pageInfo?.endCursor ?? '',
+    };
+  } catch (error) {
+    console.error('Error fetching brands data:', error);
+    return {
+      brands: [],
+      hasNextPage: false,
+      endCursor: '',
     };
   }
 }
