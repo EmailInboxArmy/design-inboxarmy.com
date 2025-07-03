@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 const GET_BRANDS_PAGE_METADATA = gql`
   query GetBrandsPageMetadata {
-    page(id: "brands", idType: SLUG) {
+    page(id: "brands", idType: URI) {
       seo {
         title
         metaDesc
@@ -62,7 +62,7 @@ export default async function Brands() {
                     <div className="container">
                         <div className="text-center pt-8 pb-12 md:py-20 max-w-4xl w-full m-auto space-y-2">
                             <h1>{brandPage?.brandTitle || 'Brands'}</h1>
-                            <p className="text-base md:text-1xl font-normal w-full m-auto pt-4 text-theme-text-2">{brandPage?.brandText || 'Explore our collection of brands'}</p>
+                            <p className="text-center text-base md:text-1xl font-normal w-full m-auto pt-4 text-theme-text-2">{brandPage?.brandText || 'Explore our collection of brands'}</p>
                         </div>
                     </div>
                 </div>
