@@ -76,35 +76,46 @@ query ContactPage {
 `;
 
 export async function generateMetadata(): Promise<Metadata> {
-    const { data } = await client.query({
-        query: GET_CONTACT_PAGE_DATA,
-    });
+    try {
+        const { data } = await client.query({
+            query: GET_CONTACT_PAGE_DATA,
+        });
 
-    const seo = data?.page?.seo;
+        const seo = data?.page?.seo;
 
-    return {
-        title: seo?.title || 'Contact Us',
-        description: seo?.metaDesc || '',
-        openGraph: {
-            title: seo?.opengraphTitle || seo?.title || 'Contact Us',
-            description: seo?.opengraphDescription || seo?.metaDesc || '',
-            images: seo?.opengraphImage?.sourceUrl ? [seo.opengraphImage.sourceUrl] : [],
-        },
-    };
+        return {
+            title: seo?.title || 'Contact Us',
+            description: seo?.metaDesc || '',
+            openGraph: {
+                title: seo?.opengraphTitle || seo?.title || 'Contact Us',
+                description: seo?.opengraphDescription || seo?.metaDesc || '',
+                images: seo?.opengraphImage?.sourceUrl ? [seo.opengraphImage.sourceUrl] : [],
+            },
+        };
+    } catch (error) {
+        console.warn('Failed to fetch metadata for contact page:', error);
+        return {
+            title: 'Contact Us',
+            description: 'Get in touch with us',
+        };
+    }
 }
 
+export const revalidate = 10;   
 export default async function ContactUs() {
     const testimonials = await getTestimonialsData();
-    const { data } = await client.query({
-        query: GET_CONTACT_PAGE_DATA,
-        context: {
-            fetchOptions: {
-                next: { revalidate: 10 }
-            }
-        }
-    });
 
-    const contactData = data?.page?.contactUs;
+    let contactData = null;
+    try {
+        const { data } = await client.query({
+            query: GET_CONTACT_PAGE_DATA,
+           
+        });
+        contactData = data?.page?.contactUs;
+    } catch (error) {
+        console.warn('Failed to fetch contact page data:', error);
+        // Provide fallback data or handle gracefully
+    }
 
     return (
         <>

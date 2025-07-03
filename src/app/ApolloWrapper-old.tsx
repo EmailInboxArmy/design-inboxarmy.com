@@ -5,5 +5,5 @@ import { client } from './lib/apollo-client';
 import React from 'react';
 
 export function ApolloWrapper({ children }: { children: React.ReactNode }) {
-    return <ApolloProvider client={client}>{children}</ApolloProvider>;    
+    return <ApolloProvider client={client}>{children}</ApolloProvider>;
 }

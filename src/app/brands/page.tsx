@@ -1,27 +1,45 @@
 import MarketingAgency from 'app/components/MarketingAgency';
-import BrandsSearch from './BrandsSearch';
-import { getBrandCategoriesData, getBrandsData, getBrandPageData } from '../lib/queries';
+import InfiniteScrollBrands from '../components/InfiniteScrollBrands';
+import { getBrandCategoriesData, getBrandPageData, getBrandsData } from '../lib/queries';
 import { Metadata } from 'next';
 import { client } from 'app/lib/apollo-client';
-import { GET_BRANDS_QUERY } from '../lib/queries';
+import { gql } from '@apollo/client';
 
 // Force dynamic rendering to prevent build-time GraphQL calls
 export const dynamic = 'force-dynamic';
 
-
-
+const GET_BRANDS_PAGE_METADATA = gql`
+  query GetBrandsPageMetadata {
+    page(id: "brands", idType: SLUG) {
+      seo {
+        title
+        metaDesc
+        opengraphTitle
+        opengraphDescription
+        opengraphImage {
+          sourceUrl
+        }
+      }
+    }
+  }
+`;
 
 export async function generateMetadata(): Promise<Metadata> {
     try {
         const { data } = await client.query({
-            query: GET_BRANDS_QUERY,
+            query: GET_BRANDS_PAGE_METADATA,
         });
 
         const seo = data?.page?.seo;
 
         return {
             title: seo?.title || 'Brands',
-            description: seo?.metaDesc || '',
+            description: seo?.metaDesc || 'Explore our collection of brands',
+            openGraph: {
+                title: seo?.opengraphTitle || 'Brands',
+                description: seo?.opengraphDescription || 'Explore our collection of brands',
+                images: seo?.opengraphImage?.sourceUrl ? [seo.opengraphImage.sourceUrl] : [],
+            },
         };
     } catch (error) {
         console.error('Error generating metadata:', error);
@@ -34,7 +52,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Brands() {
     try {
-        const { brands } = await getBrandsData();
+        const { brands, hasNextPage, endCursor } = await getBrandsData();
         const { brandCategories } = await getBrandCategoriesData();
         const { brandPage } = await getBrandPageData();
 
@@ -49,7 +67,12 @@ export default async function Brands() {
                     </div>
                 </div>
 
-                <BrandsSearch brands={brands || []} brandCategories={brandCategories || []} />
+                <InfiniteScrollBrands
+                    initialBrands={brands || []}
+                    hasNextPage={hasNextPage}
+                    endCursor={endCursor}
+                    brandCategories={brandCategories || []}
+                />
 
                 <MarketingAgency marketingAgency={{
                     title: '',

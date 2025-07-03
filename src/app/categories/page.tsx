@@ -95,17 +95,14 @@ const EMAIL_TEMPLATES_QUERY = gql`
   }
 `;
 
+export const revalidate = 10;   
 export default async function Categories() {
 
 
   try {
     const { data } = await client.query<EmailTemplateData>({
       query: EMAIL_TEMPLATES_QUERY,
-      context: {
-        fetchOptions: {
-          next: { revalidate: 10 }
-        }
-      }
+      fetchPolicy: 'no-cache',     
     });
 
     const categoriesData = await getCategoriesData();

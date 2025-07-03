@@ -71,6 +71,8 @@ const GET_SEASONAL_BY_SLUG = gql`
   }
 `;
 
+export const revalidate = 10;   
+
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
 
   const resolvedParams = await params;
@@ -86,11 +88,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     variables: {
       slug: [decodedSlug],
     },
-    context: {
-      fetchOptions: {
-        next: { revalidate: 10 }
-      }
-    }
+   
   });
 
   const seo = data?.seasonals?.nodes?.[0]?.seo;
