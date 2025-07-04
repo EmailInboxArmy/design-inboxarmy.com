@@ -53,6 +53,7 @@ interface EmailTemplateData {
   };
 }
 
+
 const GET_HOME_PAGE_DATA = gql`
 query HomePage {
     page(id: "home", idType: URI) {
@@ -71,7 +72,7 @@ query HomePage {
 
 const EMAIL_TEMPLATES_QUERY = gql`
   query EmailTemplate($after: String) {
-    posts(first: 11, after: $after) {     
+    posts(first: 75, after: $after) {     
       nodes {
         title
         slug
@@ -111,6 +112,7 @@ const EMAIL_TEMPLATES_QUERY = gql`
      
   }
 `;
+
 
 export const revalidate = 10;
 

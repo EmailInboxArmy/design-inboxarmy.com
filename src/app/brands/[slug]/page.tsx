@@ -33,7 +33,7 @@ const GET_BRAND_AND_POSTS_QUERY = gql`
         }
       }
     }
-    posts(first: 10000) {
+    posts(first: 100) {
       nodes {
         title
         slug
@@ -175,12 +175,11 @@ export default async function BrandDetail({ params }: { params: Promise<Params> 
 
                 <div className='w-full md:w-auto md:pl-2'>
                   <h1>{brandInfo.title}</h1>
-                  
-                    <p className="text-base lg:text-1xl text-theme-text-2 mt-4 ">
-                      A collection of emails built by {brandInfo.title}
-                       
-                    </p>
-                  
+
+                  <p className="text-base lg:text-1xl text-theme-text-2 mt-4 ">
+                    A collection of emails built by {brandInfo.title}
+                  </p>
+
                 </div>
               </div>
               <div className='w-full md:w-4/12 flex justify-center md:justify-end mt-8 md:mt-0'>

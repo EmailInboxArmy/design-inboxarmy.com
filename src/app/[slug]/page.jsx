@@ -115,7 +115,7 @@ const POSTS_QUERY = gql`
                   }
                   }
               }
-              }
+            }
           }
         }
       }
@@ -137,7 +137,6 @@ export async function generateMetadata({ params }) {
 
         let data;
         let post = null;
-
         // Try the original post query first
         try {
             const response = await client.query({
