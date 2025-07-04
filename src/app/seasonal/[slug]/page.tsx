@@ -34,7 +34,7 @@ const GET_SEASONAL_BY_SLUG = gql`
         name
         slug
         description
-        posts(first: 11) {
+        posts(first: 75) {
           nodes {
             title
             slug

@@ -54,7 +54,7 @@ interface EmailTemplateData {
 
 const EMAIL_TEMPLATES_QUERY = gql`
     query EmailTemplate($after: String) {
-    posts(first: 11, after: $after) {
+    posts(first: 75, after: $after) {
       nodes {
         title
         slug

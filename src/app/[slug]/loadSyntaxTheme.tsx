@@ -1,4 +1,5 @@
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
 export const loadOneDarkTheme = async () => {
-    const theme = await import('react-syntax-highlighter/dist/cjs/styles/prism/one-dark');
-    return theme.default;
+    return oneDark;
 };

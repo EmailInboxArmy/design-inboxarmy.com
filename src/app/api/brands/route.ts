@@ -42,7 +42,6 @@ export async function POST(request: Request) {
     });
 
     const brandsData = data?.brands?.nodes ?? [];
-    console.log('API Brands data (server-side sorted):', brandsData.map((brand: { title: string; slug: string }) => ({ title: brand.title, slug: brand.slug })));
 
     const responseData = {
       ...data,

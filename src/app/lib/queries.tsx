@@ -5,10 +5,10 @@ export const SEARCH_POSTS = gql`
   query SearchQuery($search: String!) {
     posts(
       where: { 
-        search: $search,
+        metaQuery: {metaArray: [{key: "content", value: $search, compare: LIKE}]}
         orderby: { field: DATE, order: DESC }
       },
-      first: 1000
+      first: 100
     ) {
       nodes {
         id
@@ -54,9 +54,9 @@ export const SEARCH_POSTS_ALT = gql`
   query SearchQueryAlt($search: String!) {
     posts(
       where: { 
-        search: $search
+        metaQuery: {metaArray: [{key: "content", value: $search, compare: LIKE}]}
       },
-      first: 1000
+      first: 100
     ) {
       nodes {
         id
@@ -95,7 +95,7 @@ export const SIMPLE_SEARCH_POSTS = gql`
   query SimpleSearchQuery($search: String!) {
     posts(
       where: { 
-        search: $search
+        metaQuery: {metaArray: [{key: "content", value: $search, compare: LIKE}]}
       }
     ) {
       nodes {
@@ -127,23 +127,73 @@ export const SIMPLE_SEARCH_POSTS = gql`
   }
 `;
 
+// Paginated search query for infinite scroll (50 posts per page)
+export const SEARCH_POSTS_PAGINATED = gql`  
+  query SearchQueryPaginated($search: String!, $after: String) {
+    posts(
+      where: { 
+        metaQuery: {metaArray: [{key: "content", value: $search, compare: LIKE}]}
+        orderby: { field: DATE, order: DESC }
+      },
+      first: 50,
+      after: $after
+    ) {
+      nodes {
+        id
+        title
+        slug
+        excerpt
+        date
+        featuredImage {
+          node {
+            sourceUrl
+            altText
+          }
+        }
+        emailTypes {
+          nodes {
+            name
+            slug
+          }
+        }
+        industries {
+          nodes {
+            name
+            slug
+          }
+        }
+        seasonals {
+          nodes {
+            name
+            slug
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
 const GET_MENUDATA_QUERY = gql`
   query menudata {
-    emailTypes(first: 1000000) {
+    emailTypes(first: 50) {
       nodes {
         name
         slug
         count
       }
     }
-    seasonals(first: 1000000) {
+    seasonals(first: 50) {
       nodes {
         name
         slug
         count
       }
     }
-    industries(first: 1000000) {
+    industries(first: 50) {
       nodes {
         name
         slug
@@ -304,7 +354,7 @@ export async function getBrandsData(after: string | null = null) {
     });
 
     const brandsData = data?.brands?.nodes ?? [];
-    console.log('Brands data (server-side sorted):', brandsData.map((brand: { title: string; slug: string }) => ({ title: brand.title, slug: brand.slug })));
+
 
     return {
       brands: brandsData,

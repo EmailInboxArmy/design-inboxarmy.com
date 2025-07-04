@@ -319,10 +319,15 @@ textarea {
 .sticky-header .min-menu>ul>li>a:hover {
   color: #00BEF2;
 }
-
 /* Header */
-
-
+.email-image {
+  position: relative;
+  background-color: #e6e6e6;
+  background-image: url(../images/inboxarmy-logo.svg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100px;
+}
 .email-image img {
   top: 0;
   -webkit-transition: all 0.1s ease-in-out;
@@ -332,14 +337,6 @@ textarea {
 .email-image {
   padding-bottom: 170%;
 }
-
-/* .email-link:hover .email-image img {
-  top: 100%;
-  transform: translate(0, -100%);
-  -webkit-transition: all 3s ease-in-out;
-  transition: all 3s ease-in-out;
-} */
-
 .shadow-custom {
   box-shadow: 0 6px 25px rgba(86, 92, 56, 0.1);
 }

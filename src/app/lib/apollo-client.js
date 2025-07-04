@@ -9,4 +9,12 @@ export const client = new ApolloClient({
         credentials: 'same-origin'
     }),
     cache: new InMemoryCache(),
+    defaultOptions: {
+        watchQuery: {
+          errorPolicy: 'ignore',
+        },
+        query: {
+          errorPolicy: 'ignore',
+        },
+      },
 });
