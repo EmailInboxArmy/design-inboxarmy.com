@@ -5,7 +5,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 This project requires the following environment variable to be set:
 
 ```bash
-NEXT_PUBLIC_GRAPHQL_ENDPOINT=https://design-backend.inboxarmy.com/graphql
+NEXT_PUBLIC_GRAPHQL_ENDPOINT=http://design-backend.inboxarmy.com/graphql
 ```
 
 Create a `.env.local` file in the root directory with the above variable for local development.
@@ -48,7 +48,7 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 1. Push your code to GitHub
 2. Connect your repository to Vercel
 3. Add the following environment variable in Vercel:
-   - `NEXT_PUBLIC_GRAPHQL_ENDPOINT`: `https://design-backend.inboxarmy.com/graphql`
+   - `NEXT_PUBLIC_GRAPHQL_ENDPOINT`: `http://design-backend.inboxarmy.com/graphql`
 4. Deploy
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
