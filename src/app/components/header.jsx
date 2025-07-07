@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import HeaderSearch from './HeaderSearch';
 import { postdata } from '../lib/queries';
+import { Suspense } from 'react';
 
 // components/Header.tsx
 import HeaderClientWrapper from './HeaderClientWrapper';
@@ -152,7 +153,9 @@ export default async function Header() {
                                 </svg>
                             </span>
                             <div className='header-search hidden xl:flex flex-wrap items-center'>
-                                <HeaderSearch />
+                                <Suspense fallback={null}>
+                                    <HeaderSearch />
+                                </Suspense>
                             </div>
                             {/* <button className="font-semibold px-5 py-4 text-theme-dark hover:bg-theme-dark hover:text-white whitespace-nowrap  rounded-lg bg-transparent border-none">Sign up</button>
                             <button className="bg-theme-blue text-white hover:bg-theme-dark font-semibold px-5 py-4 rounded-lg whitespace-nowrap border-none">Log in</button> */}

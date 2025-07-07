@@ -1,14 +1,21 @@
 'use client';
 
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 import SearchIcon from '../images/search-icon.svg'
 
 export default function HeaderSearch() {
     const [keyword, setKeyword] = useState('');
     const router = useRouter();
+    const searchParams = useSearchParams();
+
+    // Update search term when URL changes (e.g., when navigating from search page)
+    useEffect(() => {
+        const urlKeyword = searchParams.get('keyword') || '';
+        setKeyword(urlKeyword);
+    }, [searchParams]);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -20,7 +27,7 @@ export default function HeaderSearch() {
         console.log('Navigating to:', searchUrl); // Debug log
 
         router.push(searchUrl);
-        setKeyword('');
+        // Don't clear the keyword anymore to maintain it in the input
     };
 
     return (

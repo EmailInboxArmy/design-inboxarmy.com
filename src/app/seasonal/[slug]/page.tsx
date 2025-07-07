@@ -41,7 +41,7 @@ const GET_SEASONAL_BY_SLUG = gql`
             uri
             featuredImage {
               node {
-                sourceUrl(size: CUSTOM_300X600)
+                sourceUrl
               }
             }
             emailTypes {

@@ -53,7 +53,6 @@ interface EmailTemplateData {
   };
 }
 
-
 const GET_HOME_PAGE_DATA = gql`
 query HomePage {
     page(id: "home", idType: URI) {
@@ -113,9 +112,7 @@ const EMAIL_TEMPLATES_QUERY = gql`
   }
 `;
 
-
 export const revalidate = 10;
-
 export async function generateMetadata(): Promise<Metadata> {
   try {
     const { data } = await client.query({
@@ -170,9 +167,11 @@ export default async function Home() {
         </div>
       </>
     );
+
   } catch (error) {
     console.error('Error fetching home page data:', error);
     return (
+
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Welcome to InboxArmy</h1>
@@ -187,6 +186,7 @@ export default async function Home() {
           </div>
         </div>
       </div>
+
     );
   }
 }

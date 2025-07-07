@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import EmailCard from "./EmailCard";
 import { useInView } from 'react-intersection-observer';
 import Image from "next/image";
@@ -102,42 +102,42 @@ export default function InfiniteScrollTemplates({
         rootMargin: '100px',
     });
 
-    useEffect(() => {
-        const loadMoreTemplates = async () => {
-            if (inView && hasNextPage && !isLoading) {
-                setIsLoading(true);
-                try {
-                    const response = await fetch('/api/templates', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            after: endCursor,
-                        }),
-                    });
+    const loadMoreTemplates = useCallback(async () => {
+        if (inView) {
+            setIsLoading(true);
+            try {
+                const response = await fetch('/api/templates', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        after: endCursor,
+                    }),
+                });
 
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-
-                    const data = await response.json();
-
-                    if (data.posts) {
-                        setTemplates(prev => [...prev, ...data.posts.nodes]);
-                        setHasNextPage(data.posts.pageInfo.hasNextPage);
-                        setEndCursor(data.posts.pageInfo.endCursor);
-                    }
-                } catch (error) {
-                    console.error('Error loading more templates:', error);
-                } finally {
-                    setIsLoading(false);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-            }
-        };
 
+                const data = await response.json();
+
+                if (data.posts) {
+                    setTemplates(prev => [...prev, ...data.posts.nodes]);
+                    setHasNextPage(data.posts.pageInfo.hasNextPage);
+                    setEndCursor(data.posts.pageInfo.endCursor);
+                }
+            } catch (error) {
+                console.error('Error loading more templates:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+    }, [inView]);
+
+    useEffect(() => {
         loadMoreTemplates();
-    }, [inView, hasNextPage, endCursor, isLoading]);
+    }, [loadMoreTemplates]);
 
     // Function to render items with ads at specific positions: 6, 12, 24, 36, 48, etc.
     const renderItemsWithAds = () => {
