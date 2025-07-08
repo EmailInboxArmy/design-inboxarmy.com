@@ -49,7 +49,7 @@ export default function SearchInput({ searchKeyword }: SearchInputProps) {
                     required
                     value={searchTerm}
                     onChange={handleSearchChange}
-                    placeholder="Search keywords"
+                    placeholder="Search brands or keywords"
                     className="bg-transparent w-full outline-none text-gray-700 placeholder-gray-500"
                     disabled={isLoading}
                 />

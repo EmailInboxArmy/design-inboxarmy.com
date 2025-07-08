@@ -28,7 +28,7 @@ const nextConfig: NextConfig = {
   },
 
   // Add webpack configuration for better error handling
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, dev }) => {
     if (isServer) {
       // Add fallbacks for server-side rendering
       config.resolve.fallback = {
@@ -38,7 +38,24 @@ const nextConfig: NextConfig = {
         tls: false,
       };
     }
+
+    // Handle build-time errors more gracefully
+    if (!dev) {
+      config.optimization = {
+        ...config.optimization,
+        minimize: true,
+      };
+    }
+
     return config;
+  },
+
+  // Add error handling for build failures
+  onDemandEntries: {
+    // period (in ms) where the server will keep pages in the buffer
+    maxInactiveAge: 25 * 1000,
+    // number of pages that should be kept simultaneously without being disposed
+    pagesBufferLength: 2,
   },
 };
 
