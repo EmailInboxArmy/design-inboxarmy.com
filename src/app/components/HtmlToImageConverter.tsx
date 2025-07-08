@@ -45,7 +45,7 @@ export default function HtmlToImageConverter({ htmlContent }: HtmlToImageConvert
     useEffect(() => {
         // Convert to image when component mounts
         convertToImage();
-    }, [convertToImage]);
+    }, [htmlContent, convertToImage]);
 
     useEffect(() => {
         if (shadowContainerRef.current) {

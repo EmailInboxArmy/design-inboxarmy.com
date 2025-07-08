@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface DownloadImageButtonProps {
     htmlContent: string;
@@ -27,7 +27,7 @@ export default function DownloadImageButton({ htmlContent }: DownloadImageButton
         }
     };
 
-    const convertToImage = async () => {
+    const convertToImage = useCallback(async () => {
         if (!htmlContent || !isClient) return;
 
         setIsLoading(true);
@@ -54,7 +54,7 @@ export default function DownloadImageButton({ htmlContent }: DownloadImageButton
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [htmlContent, isClient]);
 
     const handleDownload = (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
@@ -98,7 +98,7 @@ export default function DownloadImageButton({ htmlContent }: DownloadImageButton
         if (isClient && htmlContent) {
             convertToImage();
         }
-    }, [htmlContent, isClient]);
+    }, [htmlContent, isClient, convertToImage]);
 
     if (!isClient) {
         return (
@@ -116,11 +116,10 @@ export default function DownloadImageButton({ htmlContent }: DownloadImageButton
             href={isGenerated && imageData ? imageData : '#'}
             onClick={handleDownload}
             aria-disabled={!isGenerated || isLoading}
-            className={`download-button download-button text-xs md:text-base bg-transparent md:hover:bg-theme-blue md:hover:text-white flex items-center justify-center px-0 md:px-4 py-1 md:py-2 rounded-lg whitespace-nowrap border-none left-button ${
-                isGenerated && !isLoading
-                    ? 'bg-theme-blue text-white hover:bg-theme-dark'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50'
-            }`}
+            className={`download-button download-button text-xs md:text-base bg-transparent md:hover:bg-theme-blue md:hover:text-white flex items-center justify-center px-0 md:px-4 py-1 md:py-2 rounded-lg whitespace-nowrap border-none left-button ${isGenerated && !isLoading
+                ? 'bg-theme-blue text-white hover:bg-theme-dark'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50'
+                }`}
             style={{ pointerEvents: isGenerated && !isLoading ? 'auto' : 'none' }}
             title={isGenerated ? "Download Email Preview" : "Generating..."}
         >
