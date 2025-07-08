@@ -1,5 +1,6 @@
 import { client } from '../lib/apollo-client'
 import { gql } from '@apollo/client'
+import { Suspense } from 'react'
 
 import HeaderSearch from "./HeaderSearch";
 
@@ -83,7 +84,9 @@ export default async function HeroSection() {
                         {heroData?.content}
                     </p>
                     <div className="w-full max-w-3xl m-auto md:px-6 mt-8 banner-search">
-                        <HeaderSearch />
+                        <Suspense fallback={null}>
+                            <HeaderSearch />
+                        </Suspense>
                     </div>
                 </div>
             </div>

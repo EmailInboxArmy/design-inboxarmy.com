@@ -674,9 +674,11 @@ textarea {
 }
 .content-text strong { font-size: 48px; font-weight: 700; display: block; line-height: 1.2; }
 
-@media(max-width: 1300px) {
-  .content-text strong { font-size: 40px;  }
+
+@media(max-width: 1600px) {
+  .content-text strong { font-size: 35px;  }
 }
+
 
 @media(max-width: 767px) {
   .content-text strong { font-size: 34px;  }

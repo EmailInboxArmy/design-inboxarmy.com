@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './styles/globals.css';
+import { Suspense } from 'react';
 
 // Components
 import Header from './components/header.jsx';
@@ -76,7 +77,9 @@ export default async function RootLayout({
 
       <body>
         <BodyClassHandler />
-        <GlobalLoader />
+        <Suspense fallback={null}>
+          <GlobalLoader />
+        </Suspense>
         <Header />
         {children}
         <Footer />

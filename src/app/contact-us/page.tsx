@@ -101,7 +101,7 @@ export async function generateMetadata(): Promise<Metadata> {
     }
 }
 
-export const revalidate = 10;   
+export const revalidate = 10;
 export default async function ContactUs() {
     const testimonials = await getTestimonialsData();
 
@@ -109,7 +109,7 @@ export default async function ContactUs() {
     try {
         const { data } = await client.query({
             query: GET_CONTACT_PAGE_DATA,
-           
+
         });
         contactData = data?.page?.contactUs;
     } catch (error) {
@@ -124,8 +124,8 @@ export default async function ContactUs() {
                     <div className="flex flex-wrap">
                         <div className="w-full lg:w-3/5 contact-form pb-12 lg:pb-0">
                             <div className="bg-gradient-to-b from-[#E9EFE9] rounded-3xl py-6 px-4 pb-12 md:pb-0 lg:px-12 lg:pt-12  ">
-                                {contactData.formTitle && <h1 className="h2 text-center mb-6" dangerouslySetInnerHTML={{ __html: contactData.formTitle }}></h1>}
-                                {contactData.formContent && <div className="text-base md:text-1xl text-center mb-8" dangerouslySetInnerHTML={{ __html: contactData.formContent }}></div>}
+                                {contactData && contactData.formTitle && <h1 className="h2 text-center mb-6" dangerouslySetInnerHTML={{ __html: contactData.formTitle }}></h1>}
+                                {contactData && contactData.formContent && <div className="text-base md:text-1xl text-center mb-8" dangerouslySetInnerHTML={{ __html: contactData.formContent }}></div>}
                                 <ContactForm />
                             </div>
                         </div>
