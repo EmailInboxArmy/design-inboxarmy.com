@@ -1,1 +1,1 @@
-export const WORDPRESS_GRAPHQL_ENDPOINT = process.env.WORDPRESS_GRAPHQL_ENDPOINT || 'http://design-backend.inboxarmy.com/graphql';
+export const WORDPRESS_GRAPHQL_ENDPOINT = process.env.WORDPRESS_GRAPHQL_ENDPOINT || 'https://design-backend.inboxarmy.com/graphql';
