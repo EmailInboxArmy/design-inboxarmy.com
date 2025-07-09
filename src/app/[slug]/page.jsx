@@ -13,6 +13,8 @@ import Link from 'next/link';
 import RecentPostData from './RecentPostData';
 import MarketingAgency from 'app/components/MarketingAgency';
 import EmailShadowPreview from './ShowEmail';
+import HtmlToImageConverter from '../components/HtmlToImageConverter';
+import DownloadImageButton from '../components/DownloadImageButton';
 
 const POST_QUERY = gql`
   query GetPost($slug: ID!) {
@@ -329,7 +331,7 @@ export default async function PostDetail({ params }) {
                                                             <span className="pl-1 md:pl-2 font-medium">Code</span>
                                                         </button>
 
-                                                        {post.featuredImage?.node?.sourceUrl && (
+                                                        {/* {post.featuredImage?.node?.sourceUrl && (
                                                             <a
                                                                 href={post.featuredImage.node.sourceUrl}
                                                                 download={post.featuredImage.node.sourceUrl}
@@ -344,7 +346,9 @@ export default async function PostDetail({ params }) {
                                                                 </span>
                                                                 <span className="pl-1 md:pl-2 font-medium">Download</span>
                                                             </a>
-                                                        )}
+                                                        )} */}
+
+                                                        <DownloadImageButton htmlContent={post.postdata.content} />
 
 
                                                     </div>
@@ -356,6 +360,10 @@ export default async function PostDetail({ params }) {
                                                     <EmailShadowPreview html={post.postdata.content} />
                                                 </div>
                                                 <CodeView content={post.postdata.content} />
+
+                                                <div>
+                                                    <HtmlToImageConverter htmlContent={post.postdata.content} /> 
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
