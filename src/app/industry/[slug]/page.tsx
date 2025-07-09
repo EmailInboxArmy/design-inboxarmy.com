@@ -34,7 +34,7 @@ const GET_INDUSTRY_WITH_POSTS = gql`
         name
         slug
         description
-        posts(first: 75) {
+        posts(first: 24) {
           nodes {
             title
             slug

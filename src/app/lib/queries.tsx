@@ -135,7 +135,7 @@ export const SEARCH_POSTS_PAGINATED = gql`
         metaQuery: {metaArray: [{key: "content", value: $search, compare: LIKE}]}
         orderby: { field: DATE, order: DESC }
       },
-      first: 50,
+      first: 24,
       after: $after
     ) {
       nodes {

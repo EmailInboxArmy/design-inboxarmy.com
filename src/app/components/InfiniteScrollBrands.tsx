@@ -240,7 +240,7 @@ export default function InfiniteScrollBrands({
                             </p>
                         </div>
                     )}
-                    <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-2 gap-y-4 md:gap-6 lg:gap-9 lg:px-10'>
+                    <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-2 gap-y-4 md:gap-6 lg:gap-9 lg:px-10 relative'>
                         {filteredBrands.map((brand: Brand, index: number) => (
                             <Link key={`${brand.slug}-${index}`} href={`/brands/${brand.slug}`} className="bg-white rounded-2xl shadow-md py-8 px-6 flex flex-col items-center border border-solid border-theme-border origin-center transition-all ease-in-out lg:hover:scale-105">
                                 <div className="w-28 lg:w-[150px] h-28 lg:h-[150px] rounded-full overflow-hidden flex items-center justify-center bg-gray-200 text-gray-700 text-3xl font-bold">

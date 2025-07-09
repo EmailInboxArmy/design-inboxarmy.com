@@ -67,7 +67,7 @@ export default async function RecentPostData() {
 
   return (
     <>
-      <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-4 gap-x-2 md:gap-5 2xl:gap-8'>
+      <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-4 gap-x-2 md:gap-5 2xl:gap-8 relative'>
         {data.posts.nodes.map((template: Template, index: number) => (
 
           <EmailCard
