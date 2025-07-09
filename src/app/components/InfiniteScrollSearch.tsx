@@ -101,7 +101,7 @@ export default function InfiniteScrollSearch({
     const hasAnyTaxonomy = hasEmailTypes || hasIndustries || hasSeasonals;
 
     return (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-4 gap-x-2 md:gap-5 2xl:gap-8 pb-4 md:pb-12">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-4 gap-x-2 md:gap-5 2xl:gap-8 pb-4 md:pb-12 relative">
             {posts.map((post: Post) => (
                 <div
                     key={post.id}
@@ -154,7 +154,7 @@ export default function InfiniteScrollSearch({
             ))}
 
             {hasNextPage && (
-                <div ref={ref} className="col-span-full h-20 flex items-center justify-center">
+                <div ref={ref} className="col-span-full h-20 flex items-center justify-center postloader">
                     {isLoading && (
                         <div className="text-center">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-theme-blue mx-auto mb-2"></div>

@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   //   serverComponentsExternalPackages: ['@apollo/client'],
   // },
 
-  serverExternalPackages: ['@apollo/client', 'puppeteer'],
+  serverExternalPackages: ['@apollo/client'],
 
   // Configure images
   images: {
@@ -25,7 +25,6 @@ const nextConfig: NextConfig = {
     // This will make pages render on-demand instead of at build time
     workerThreads: false,
     cpus: 1,
-    serverComponentsExternalPackages: ['puppeteer'],
   },
 
   // Add webpack configuration for better error handling
@@ -40,13 +39,11 @@ const nextConfig: NextConfig = {
       };
     }
 
-    // Handle Puppeteer in production
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
+    // Handle build-time errors more gracefully
+    if (!dev) {
+      config.optimization = {
+        ...config.optimization,
+        minimize: true,
       };
     }
 

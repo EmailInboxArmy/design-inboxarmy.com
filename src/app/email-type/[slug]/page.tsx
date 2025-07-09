@@ -37,7 +37,7 @@ const GET_EMAIL_TYPE_BY_SLUG = gql`
         name
         slug
         description
-        posts(first: 75) {
+        posts(first: 24) {
           nodes {
             title
             slug

@@ -4,7 +4,7 @@ import { gql } from '@apollo/client';
 
 const EMAIL_TEMPLATES_QUERY = gql`
   query EmailTemplate($after: String) {
-    posts(first: 75, after: $after) {
+    posts(first: 24, after: $after) {
       nodes {
         title
         slug
@@ -50,6 +50,10 @@ export async function POST(request: Request) {
     return NextResponse.json(data);
   } catch (error) {
     console.error('Error fetching templates:', error);
-    return NextResponse.json({ error: 'Failed to fetch templates' }, { status: 500 });
+    return NextResponse.json({
+      error: 'Failed to fetch templates',
+      details: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    }, { status: 500 });
   }
 } 

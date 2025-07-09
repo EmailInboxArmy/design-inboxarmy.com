@@ -4,7 +4,7 @@ import SearchPageClient from './SearchPageClient';
 export default function SearchPage() {
     return (
         <Suspense fallback={
-            <div className="my-10 md:my-24">
+            <div className="my-10 md:my-24 relative">
                 <div className="container">
                     <div className="max-w-2xl mx-auto text-center">
                         <h1 className="text-2xl font-bold mb-6">Search Email Templates</h1>

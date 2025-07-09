@@ -343,6 +343,7 @@ textarea {
 
 .inboxarmy-ads {
   background: radial-gradient(circle at 170px 600px, #2E3B00 0%, #1B2005 60%);
+  min-height: 450px;
 }
 
 .catagery-data span {
@@ -599,6 +600,11 @@ textarea {
   }
 }
 
+@media(max-width: 640px) {
+  .inboxarmy-ads {
+    min-height: 350px;
+  }
+}
 .website-visit-btn:hover path {
   fill: #fff;
 }
@@ -687,4 +693,17 @@ textarea {
 
 @media(max-width: 640px) {
   .content-text strong { font-size: 22px;  }
+}
+.postloader {
+  position: absolute;
+  bottom: 250vh;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: 100%;
+  height: 100px;
+  background-color: red;
+  z-index: -100;
+  visibility: hidden;
+  opacity: 0;
 }

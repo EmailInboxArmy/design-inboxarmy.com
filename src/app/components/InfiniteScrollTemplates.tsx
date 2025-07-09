@@ -132,8 +132,12 @@ export default function InfiniteScrollTemplates({
             } finally {
                 setIsLoading(false);
             }
+            console.log('inView', inView);
+            console.log('endCursor', endCursor);
+            console.log('hasNextPage', hasNextPage);
+            console.log('templates', templates);
         }
-    }, [inView]);
+    }, [inView, endCursor, templates, hasNextPage]);
 
     useEffect(() => {
         loadMoreTemplates();
@@ -196,10 +200,10 @@ export default function InfiniteScrollTemplates({
     };
 
     return (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-y-4 gap-x-2 md:gap-5 2xl:gap-8 pb-4 md:pb-12">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-y-4 gap-x-2 md:gap-5 2xl:gap-8 pb-4 md:pb-12 relative">
             {renderItemsWithAds()}
             {hasNextPage && (
-                <div ref={ref} className="col-span-full h-10 flex items-center justify-center">
+                <div ref={ref} className="col-span-full h-10 flex items-center justify-center postloader">
                     {isLoading && <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>}
                 </div>
             )}
