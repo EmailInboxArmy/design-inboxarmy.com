@@ -256,7 +256,7 @@ export default function InfiniteScrollBrands({
                                         brand.title?.charAt(0).toUpperCase() || '?'
                                     )}
                                 </div>
-                                <p className="mt-4 text-base md:text-lg font-semibold text-[#2E2B29]">{brand.title}</p>
+                                <p className="mt-4 text-base md:text-lg font-semibold text-center text-[#2E2B29]">{brand.title}</p>
                             </Link>
                         ))}
                     </div>

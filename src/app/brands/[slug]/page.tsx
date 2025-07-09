@@ -8,7 +8,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
 
-// Get brand info and all posts, then filter
 const GET_BRAND_AND_POSTS_QUERY = gql`
   query GetBrandAndPosts($slug: ID!) {
     brand(id: $slug, idType: SLUG) {
@@ -33,7 +32,7 @@ const GET_BRAND_AND_POSTS_QUERY = gql`
         }
       }
     }
-    posts(first: 100) {
+    posts(first: 24) {
       nodes {
         title
         slug

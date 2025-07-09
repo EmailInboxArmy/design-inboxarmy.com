@@ -96,7 +96,7 @@ export default async function Header() {
                                                             <Image className='w-5' src={DownArrow} width={30} header={30} alt="Icon" />
                                                         </span>
                                                     </li>
-                                                    {industries.filter(item => item.count > 0).map((item) => (
+                                                    {industries.map((item) => (
                                                         <li key={item.slug} className="w-6/12 child-2 inline-block text-left">
                                                             <Link className="text-sm md:text-base inline-block px-3 md:px-5 xl:px-2 2xl:px-5 py-1 2xl:py-2 hover:bg-theme-light-gray-3 rounded-lg text-theme-dark" href={`/industry/${item.slug}`}>
                                                                 {item.name}
