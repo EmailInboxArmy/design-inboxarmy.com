@@ -179,21 +179,21 @@ export const SEARCH_POSTS_PAGINATED = gql`
 
 const GET_MENUDATA_QUERY = gql`
   query menudata {
-    emailTypes(first: 50) {
+    emailTypes(first: 30, where: { parent: 0 }) {
       nodes {
         name
         slug
         count
       }
     }
-    seasonals(first: 50) {
+    seasonals(first: 30, where: { parent: 0 }) {
       nodes {
         name
         slug
         count
       }
     }
-    industries(first: 50) {
+    industries(first: 30, where: { parent: 0 }) {
       nodes {
         name
         slug
