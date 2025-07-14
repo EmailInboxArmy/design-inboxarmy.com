@@ -127,12 +127,12 @@ export const SIMPLE_SEARCH_POSTS = gql`
   }
 `;
 
-// Paginated search query for infinite scroll (50 posts per page)
+// Paginated search query for infinite scroll (24 posts per page)
 export const SEARCH_POSTS_PAGINATED = gql`  
   query SearchQueryPaginated($search: String!, $after: String) {
     posts(
       where: { 
-        metaQuery: {metaArray: [{key: "content", value: $search, compare: LIKE}]}
+        search: $search
         orderby: { field: DATE, order: DESC }
       },
       first: 24,
@@ -179,21 +179,21 @@ export const SEARCH_POSTS_PAGINATED = gql`
 
 const GET_MENUDATA_QUERY = gql`
   query menudata {
-    emailTypes(first: 30, where: { parent: 0 }) {
+    emailTypes(first: 30, where: {parent: 0}) {
       nodes {
         name
         slug
         count
       }
     }
-    seasonals(first: 30, where: { parent: 0 }) {
+    seasonals(first: 30, where: {parent: 0}) {
       nodes {
         name
         slug
         count
       }
     }
-    industries(first: 30, where: { parent: 0 }) {
+    industries(first: 30, where: {parent: 0}) {
       nodes {
         name
         slug
@@ -323,6 +323,44 @@ export const GET_BRANDS_QUERY = gql`
             slug
           }
         }
+        databaseId
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
+export const GET_BRANDS_WITH_POSTS_QUERY = gql`
+  query GetBrandsWithPosts($after: String) {
+    brands(first: 30, after: $after, where: { orderby: { field: TITLE, order: ASC } }) {
+      nodes {
+        seo {
+          title
+          metaDesc
+          opengraphTitle
+          opengraphDescription
+          opengraphImage {
+            sourceUrl
+          }
+        }
+        featuredImage {
+          node {
+            sourceUrl
+            altText
+          }
+        }
+        slug
+        title
+        brandCategories(first: 50) {
+          nodes {
+            name
+            slug
+          }
+        }
+        databaseId
       }
       pageInfo {
         hasNextPage
@@ -370,3 +408,177 @@ export async function getBrandsData(after: string | null = null) {
     };
   }
 }
+
+export async function getBrandsWithPostsData(after: string | null = null) {
+  try {
+    // First, get all brands
+    const { data } = await client.query({
+      query: GET_BRANDS_WITH_POSTS_QUERY,
+      variables: { after }
+    });
+
+    const allBrands = data?.brands?.nodes ?? [];
+
+    // Filter brands to only include those with posts
+    const brandsWithPosts = [];
+
+    for (const brand of allBrands) {
+      // Check if this brand has any posts
+      const { data: postsData } = await client.query({
+        query: gql`
+          query CheckBrandPosts($brandId: String) {
+            posts(
+              first: 1,
+              where: {metaQuery: {metaArray: {key: "brand", value: $brandId}}}
+            ) {
+              nodes {
+                id
+              }
+            }
+          }
+        `,
+        variables: { brandId: brand.databaseId?.toString() }
+      });
+
+      // If the brand has posts, include it
+      if (postsData?.posts?.nodes && postsData.posts.nodes.length > 0) {
+        brandsWithPosts.push(brand);
+      }
+    }
+
+    return {
+      brands: brandsWithPosts,
+      hasNextPage: data?.brands?.pageInfo?.hasNextPage ?? false,
+      endCursor: data?.brands?.pageInfo?.endCursor ?? '',
+    };
+  } catch (error) {
+    console.error('Error fetching brands with posts data:', error);
+    return {
+      brands: [],
+      hasNextPage: false,
+      endCursor: '',
+    };
+  }
+}
+
+export async function searchBrandsWithPosts(search: string) {
+  try {
+    // First, get all brands that match the search
+    const { data } = await client.query({
+      query: gql`
+        query SearchBrands($search: String!) {
+          brands(
+            first: 1000, 
+            where: { 
+              search: $search,
+              orderby: { field: TITLE, order: ASC }
+            }
+          ) {
+            nodes {
+              seo {
+                title
+                metaDesc
+                opengraphTitle
+                opengraphDescription
+                opengraphImage {
+                  sourceUrl
+                }
+              }
+              featuredImage {
+                node {
+                  sourceUrl
+                  altText
+                }
+              }
+              slug
+              title
+              brandCategories(first: 50) {
+                nodes {
+                  name
+                  slug
+                }
+              }
+              databaseId
+            }
+          }
+        }
+      `,
+      variables: { search: search.trim() }
+    });
+
+    const allBrands = data?.brands?.nodes ?? [];
+
+    // Filter brands to only include those with posts
+    const brandsWithPosts = [];
+
+    for (const brand of allBrands) {
+      // Check if this brand has any posts
+      const { data: postsData } = await client.query({
+        query: gql`
+          query CheckBrandPosts($brandId: String) {
+            posts(
+              first: 1,
+              where: {metaQuery: {metaArray: {key: "brand", value: $brandId}}}
+            ) {
+              nodes {
+                id
+              }
+            }
+          }
+        `,
+        variables: { brandId: brand.databaseId?.toString() }
+      });
+
+      // If the brand has posts, include it
+      if (postsData?.posts?.nodes && postsData.posts.nodes.length > 0) {
+        brandsWithPosts.push(brand);
+      }
+    }
+
+    return {
+      brands: brandsWithPosts,
+    };
+  } catch (error) {
+    console.error('Error searching brands with posts:', error);
+    return {
+      brands: [],
+    };
+  }
+}
+
+// // Alternative brands query with different ordering approaches
+// export const GET_BRANDS_ORDERED_QUERY = gql`
+//   query GetBrandsOrdered($after: String) {
+//     brands(first: 30, after: $after, where: { orderby: { field: TITLE, order: ASC } }) {
+//       nodes {
+//         seo {
+//           title
+//           metaDesc
+//           opengraphTitle
+//           opengraphDescription
+//           opengraphImage {
+//             sourceUrl
+//           }
+//         }
+//         featuredImage {
+//           node {
+//             sourceUrl
+//             altText
+//           }
+//         }
+//         slug
+//         title
+//         brandCategories(first: 50) {
+//           nodes {
+//             name
+//             slug
+//           }
+//         }
+//       }
+//       pageInfo {
+//         hasNextPage
+//         endCursor
+//       }
+//     }
+//   }
+// `;

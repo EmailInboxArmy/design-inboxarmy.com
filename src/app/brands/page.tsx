@@ -1,6 +1,6 @@
 import MarketingAgency from 'app/components/MarketingAgency';
 import InfiniteScrollBrands from '../components/InfiniteScrollBrands';
-import { getBrandCategoriesData, getBrandPageData, getBrandsData } from '../lib/queries';
+import { getBrandCategoriesData, getBrandPageData, getBrandsWithPostsData } from '../lib/queries';
 import { Metadata } from 'next';
 import { client } from 'app/lib/apollo-client';
 import { gql } from '@apollo/client';
@@ -52,7 +52,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Brands() {
     try {
-        const { brands, hasNextPage, endCursor } = await getBrandsData();
+        const { brands, hasNextPage, endCursor } = await getBrandsWithPostsData();
         const { brandCategories } = await getBrandCategoriesData();
         const { brandPage } = await getBrandPageData();
 

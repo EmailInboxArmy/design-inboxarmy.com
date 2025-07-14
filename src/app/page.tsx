@@ -81,21 +81,21 @@ const EMAIL_TEMPLATES_QUERY = gql`
             sourceUrl
           }
         }      
-        emailTypes(first: 1) {
+        emailTypes(first: 10, where: { parent: null }) {
           nodes {
             id
             name
             slug
           }
         }
-        industries(first: 1) {
+        industries(first: 10, where: { parent: null }) {
           nodes {
             id
             name
             slug
           }
         }
-        seasonals(first: 1) {
+        seasonals(first: 10, where: { parent: null }) {
           nodes {
             id
             name

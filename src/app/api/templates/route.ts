@@ -14,19 +14,25 @@ const EMAIL_TEMPLATES_QUERY = gql`
             sourceUrl
           }
         }
-        emailTypes {
+        emailTypes(first: 10, where: { parent: null }) {
           nodes {
+            id
             name
+            slug
           }
         }
-        industries {
+        industries(first: 10, where: { parent: null }) {
           nodes {
+            id
             name
+            slug
           }
         }
-        seasonals {
+        seasonals(first: 10, where: { parent: null }) {
           nodes {
+            id
             name
+            slug
           }
         }
       }

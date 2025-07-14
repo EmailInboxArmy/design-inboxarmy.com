@@ -1,39 +1,5 @@
 import { NextResponse } from 'next/server';
-import { client } from '../../../lib/apollo-client';
-import { gql } from '@apollo/client';
-
-const SEARCH_BRANDS_QUERY = gql`
-  query SearchBrands($search: String!) {
-    brands(
-      first: 1000, 
-      where: { 
-        search: $search,
-        orderby: { field: TITLE, order: ASC }
-      }
-    ) {
-      nodes {
-        featuredImage {
-          node {
-            sourceUrl
-            altText
-          }
-        }
-        slug
-        title
-        brandCategories {
-          nodes {
-            name
-            slug
-          }
-        }
-      }
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-    }
-  }
-`;
+import { searchBrandsWithPosts } from '../../../lib/queries';
 
 export async function POST(request: Request) {
   try {
@@ -47,20 +13,14 @@ export async function POST(request: Request) {
       });
     }
 
-    const { data } = await client.query({
-      query: SEARCH_BRANDS_QUERY,
-      variables: {
-        search: search.trim()
-      },
-    });
+    const { brands } = await searchBrandsWithPosts(search);
 
-    const brandsData = data?.brands?.nodes ?? [];
-    console.log('API Search results count:', brandsData.length);
-    console.log('API Search results:', brandsData.map((brand: { title: string; slug: string }) => ({ title: brand.title, slug: brand.slug })));
+    console.log('API Search results count:', brands.length);
+    console.log('API Search results:', brands.map((brand: { title: string; slug: string }) => ({ title: brand.title, slug: brand.slug })));
 
     const responseData = {
       brands: {
-        nodes: brandsData,
+        nodes: brands,
         pageInfo: {
           hasNextPage: false, // For search results, we don't need pagination
           endCursor: ''
