@@ -82,7 +82,7 @@ export default async function Header() {
                                                     </li>
                                                     {emailTypes.filter(item => item.count > 0).map((item) => (
                                                         <li key={item.slug} className="w-6/12 child-2 inline-block text-left">
-                                                            <Link className="text-sm md:text-base inline-block px-3 md:px-5 xl:px-2 2xl:px-5 py-1 2xl:py-2 hover:bg-theme-light-gray-3 rounded-lg text-theme-dark" href={`/email-type/${item.slug}`}>
+                                                            <Link className="text-sm 2xl:text-base inline-block px-3 md:px-5 xl:px-2 2xl:px-5 py-1 2xl:py-2 hover:bg-theme-light-gray-3 rounded-lg text-theme-dark" href={`/email-type/${item.slug}`}>
                                                                 {item.name}
                                                             </Link>
                                                         </li>
@@ -98,7 +98,7 @@ export default async function Header() {
                                                     </li>
                                                     {industries.map((item) => (
                                                         <li key={item.slug} className="w-6/12 child-2 inline-block text-left">
-                                                            <Link className="text-sm md:text-base inline-block px-3 md:px-5 xl:px-2 2xl:px-5 py-1 2xl:py-2 hover:bg-theme-light-gray-3 rounded-lg text-theme-dark" href={`/industry/${item.slug}`}>
+                                                            <Link className="text-sm 2xl:text-base inline-block px-3 md:px-5 xl:px-2 2xl:px-5 py-1 2xl:py-2 hover:bg-theme-light-gray-3 rounded-lg text-theme-dark" href={`/industry/${item.slug}`}>
                                                                 {item.name}
                                                             </Link>
                                                         </li>
@@ -116,7 +116,7 @@ export default async function Header() {
 
                                                         {seasonals.filter(item => item.count > 0).map((item) => (
                                                             <li key={item.slug} className="w-6/12 child-2 inline-block text-left">
-                                                                <Link className="text-sm md:text-base inline-block px-3 md:px-5 xl:px-2 2xl:px-5 py-1 2xl:py-2 hover:bg-theme-light-gray-3 rounded-lg text-theme-dark" href={`/seasonal/${item.slug}`}>
+                                                                <Link className="text-sm 2xl:text-base inline-block px-3 md:px-5 xl:px-2 2xl:px-5 py-1 2xl:py-2 hover:bg-theme-light-gray-3 rounded-lg text-theme-dark" href={`/seasonal/${item.slug}`}>
                                                                     {item.name}
                                                                 </Link>
                                                             </li>

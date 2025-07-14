@@ -1,53 +1,20 @@
 import { NextResponse } from 'next/server';
-import { client } from '../../lib/apollo-client';
-import { gql } from '@apollo/client';
-
-const BRANDS_QUERY = gql`
-  query GetBrands($after: String) {
-    brands(first: 30, after: $after, where: { orderby: { field: TITLE, order: ASC } }) {
-      nodes {
-        featuredImage {
-          node {
-            sourceUrl
-            altText
-          }
-        }
-        slug
-        title
-        brandCategories {
-          nodes {
-            name
-            slug
-          }
-        }
-      }
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-    }
-  }
-`;
+import { getBrandsWithPostsData } from '../../lib/queries';
 
 export async function POST(request: Request) {
   try {
     const { after } = await request.json();
     console.log('API brands request - after:', after);
 
-    const { data } = await client.query({
-      query: BRANDS_QUERY,
-      variables: {
-        after
-      },
-    });
-
-    const brandsData = data?.brands?.nodes ?? [];
+    const { brands, hasNextPage, endCursor } = await getBrandsWithPostsData(after);
 
     const responseData = {
-      ...data,
       brands: {
-        ...data.brands,
-        nodes: brandsData
+        nodes: brands,
+        pageInfo: {
+          hasNextPage,
+          endCursor
+        }
       }
     };
 

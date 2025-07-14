@@ -319,6 +319,7 @@ textarea {
 .sticky-header .min-menu>ul>li>a:hover {
   color: #00BEF2;
 }
+
 /* Header */
 .email-image {
   position: relative;
@@ -328,6 +329,7 @@ textarea {
   background-repeat: no-repeat;
   background-size: 100px;
 }
+
 .email-image img {
   top: 0;
   -webkit-transition: all 0.1s ease-in-out;
@@ -337,6 +339,7 @@ textarea {
 .email-image {
   padding-bottom: 170%;
 }
+
 .shadow-custom {
   box-shadow: 0 6px 25px rgba(86, 92, 56, 0.1);
 }
@@ -605,6 +608,7 @@ textarea {
     min-height: 350px;
   }
 }
+
 .website-visit-btn:hover path {
   fill: #fff;
 }
@@ -616,7 +620,7 @@ textarea {
 
 .email-service-section p strong,
 .email-service-section p {
-    font-size: 18px;
+  font-size: 18px;
 }
 
 .info-text p {
@@ -678,22 +682,38 @@ textarea {
 .page-seasonal .catagery-data span.active-tag {
   display: block;
 }
-.content-text strong { font-size: 48px; font-weight: 700; display: block; line-height: 1.2; }
+
+.content-text strong {
+  font-size: 48px;
+  font-weight: 700;
+  display: block;
+  line-height: 1.2;
+}
 
 
 @media(max-width: 1600px) {
-  .content-text strong { font-size: 35px;  }
+  .content-text strong {
+    font-size: 35px;
+  }
 }
 
 
 @media(max-width: 767px) {
-  .content-text strong { font-size: 34px;  }
-  .video-text { font-size: 16px; }
+  .content-text strong {
+    font-size: 34px;
+  }
+
+  .video-text {
+    font-size: 16px;
+  }
 }
 
 @media(max-width: 640px) {
-  .content-text strong { font-size: 22px;  }
+  .content-text strong {
+    font-size: 22px;
+  }
 }
+
 .postloader {
   position: absolute;
   bottom: 250vh;

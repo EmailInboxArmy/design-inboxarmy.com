@@ -58,7 +58,7 @@ const httpLink = new HttpLink({
 
         // Add timeout to prevent hanging requests during build
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 30 second timeout
 
         return fetch(uri, {
             ...options,

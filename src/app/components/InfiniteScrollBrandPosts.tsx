@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import EmailCard from "./EmailCard";
 import { useInView } from 'react-intersection-observer';
 import Image from "next/image";
@@ -45,14 +45,13 @@ interface AdBox {
     };
 }
 
-interface InfiniteScrollTemplatesProps {
+interface InfiniteScrollBrandPostsProps {
     initialTemplates: Template[];
     hasNextPage: boolean;
     endCursor: string;
     adBoxes: AdBox[];
+    brandId: string;
     activeTagSlug?: string;
-    apiEndpoint?: string;
-    apiParams?: Record<string, string | number | boolean>;
 }
 
 // AdCard component for rendering individual ads
@@ -87,73 +86,81 @@ function AdCard({ adBox }: { adBox: AdBox }) {
     );
 }
 
-export default function InfiniteScrollTemplates({
+export default function InfiniteScrollBrandPosts({
     initialTemplates,
     hasNextPage: initialHasNextPage,
     endCursor: initialEndCursor,
     adBoxes,
-    activeTagSlug,
-    apiEndpoint = '/api/templates',
-    apiParams = {}
-}: InfiniteScrollTemplatesProps) {
+    brandId,
+    activeTagSlug
+}: InfiniteScrollBrandPostsProps) {
     const [templates, setTemplates] = useState<Template[]>(initialTemplates);
     const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
     const [endCursor, setEndCursor] = useState(initialEndCursor);
     const [isLoading, setIsLoading] = useState(false);
+    const [lastLoadedBatch, setLastLoadedBatch] = useState(0);
+    const loadingRef = useRef(false);
 
     const { ref, inView } = useInView({
         threshold: 0,
         rootMargin: '100px',
     });
 
-    const loadMoreTemplates = useCallback(async () => {
-        if (inView) {
+    // Single effect to handle infinite scroll
+    useEffect(() => {
+        const loadMoreTemplates = async () => {
+            // Don't load if already loading, no next page, or not in view
+            if (loadingRef.current || !inView || !hasNextPage) return;
+
+            // Calculate the exact threshold for the next batch
+            const currentBatchSize = 24;
+            const nextBatchThreshold = (lastLoadedBatch + 1) * currentBatchSize;
+
+            // Only load if we have exactly reached the threshold
+            if (templates.length !== nextBatchThreshold) return;
+
+            // Set loading state
+            loadingRef.current = true;
             setIsLoading(true);
+
             try {
-                const response = await fetch(apiEndpoint, {
+                const response = await fetch('/api/brand-posts', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
                         after: endCursor,
-                        ...apiParams,
+                        brandId: brandId,
                     }),
                 });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
                 const data = await response.json();
 
-                if (data.posts) {
+                if (data.posts && data.posts.nodes.length > 0) {
                     setTemplates(prev => [...prev, ...data.posts.nodes]);
                     setHasNextPage(data.posts.pageInfo.hasNextPage);
                     setEndCursor(data.posts.pageInfo.endCursor);
+                    setLastLoadedBatch(lastLoadedBatch + 1);
                 }
             } catch (error) {
-                console.error('Error loading more templates:', error);
+                console.error('Error loading more brand posts:', error);
             } finally {
+                loadingRef.current = false;
                 setIsLoading(false);
             }
-            console.log('inView', inView);
-            console.log('endCursor', endCursor);
-            console.log('hasNextPage', hasNextPage);
-            console.log('templates', templates);
-        }
-    }, [inView, endCursor, templates, hasNextPage, apiEndpoint, apiParams]);
-
-    useEffect(() => {
+        };
         loadMoreTemplates();
-    }, [loadMoreTemplates]);
+    }, [inView, endCursor, templates.length, lastLoadedBatch, hasNextPage, brandId]);
 
     // Function to render items with ads at specific positions: 6, 12, 24, 36, 48, etc.
     const renderItemsWithAds = () => {
         const items = [];
 
         for (let i = 0; i < templates.length; i++) {
-            // Add the email template
+            // Template card
             items.push(
                 <EmailCard
                     key={`template-${templates[i].title}-${i}`}
@@ -161,41 +168,33 @@ export default function InfiniteScrollTemplates({
                     image={templates[i].featuredImage?.node?.sourceUrl || ''}
                     slug={templates[i].slug}
                     template={templates[i] as Template & {
-                        emailTypes: { nodes: { name: string, slug: string }[] };
-                        industries: { nodes: { name: string, slug: string }[] };
-                        seasonals: { nodes: { name: string, slug: string }[] };
+                        emailTypes: { nodes: { name: string }[] };
+                        industries: { nodes: { name: string }[] };
+                        seasonals: { nodes: { name: string }[] };
                     }}
                     activeTagSlug={activeTagSlug}
                 />
             );
 
-            // Add ad at specific positions: 5, 12, then every 12 after that (24, 36, 48, etc.)
             const position = i + 1;
             const shouldShowAd = position === 5 || (position >= 12 && position % 12 === 0);
 
             if (shouldShowAd && adBoxes && adBoxes.length > 0) {
-                // Calculate which ad to show
                 let adIndex;
                 if (position === 5) {
-                    adIndex = 0; // First ad at position 5
+                    adIndex = 0;
                 } else if (position === 12) {
-                    adIndex = 1; // Second ad at position 12
+                    adIndex = 1;
                 } else {
-                    // For positions 24, 36, 48, etc., cycle through ads starting from the beginning
                     adIndex = Math.floor((position / 12) - 2) % adBoxes.length;
                 }
 
-                // Ensure adIndex is valid and within bounds
                 adIndex = Math.max(0, adIndex % adBoxes.length);
                 const adBox = adBoxes[adIndex];
 
-                // Only render ad if adBox exists and has required properties
                 if (adBox && adBox.cta && adBox.title) {
                     items.push(
-                        <AdCard
-                            key={`ad-${position}-${adIndex}`}
-                            adBox={adBox}
-                        />
+                        <AdCard key={`ad-${items.length}`} adBox={adBox} />
                     );
                 }
             }
@@ -205,11 +204,16 @@ export default function InfiniteScrollTemplates({
     };
 
     return (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-y-4 gap-x-2 md:gap-5 2xl:gap-8 pb-4 md:pb-12 relative">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-y-4 gap-x-2 md:gap-5 2xl:gap-8 pb-4 md:pb-12">
             {renderItemsWithAds()}
             {hasNextPage && (
                 <div ref={ref} className="col-span-full h-10 flex items-center justify-center postloader">
-                    {isLoading && <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>}
+                    {isLoading && (
+                        <div className="flex flex-col items-center">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mb-2"></div>
+                            <p className="text-sm text-gray-600">Loading more posts...</p>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

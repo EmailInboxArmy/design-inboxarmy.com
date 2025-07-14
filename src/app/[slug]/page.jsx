@@ -42,21 +42,21 @@ const POST_QUERY = gql`
             altText
             }
         }
-        emailTypes(first: 30) {
+        emailTypes(first: 30, where: { parent: null }) {
             nodes {
             id
             name
             slug
             }
         }
-        industries(first: 30) {
+        industries(first: 30, where: { parent: null }) {
             nodes {
             id
             name
             slug
             }
         }
-        seasonals(first: 30) {
+        seasonals(first: 30, where: { parent: null }) {
             nodes {
             id
             name
@@ -80,21 +80,21 @@ const POSTS_QUERY = gql`
             altText
           }
         }
-        emailTypes(first: 30) {
+        emailTypes(first: 30, where: { parent: null }) {
           nodes {
             id
             name
             slug
           }
         }
-        industries(first: 30) {
+        industries(first: 30, where: { parent: null }) {
           nodes {
             id
             name
             slug
           }
         }
-        seasonals(first: 30) {
+        seasonals(first: 30, where: { parent: null }) {
           nodes {
             id
             name
@@ -419,6 +419,7 @@ export default async function PostDetail({ params }) {
                                                         <span className="text-base font-medium block leading-4 bg-theme-light-gray-2 text-theme-dark px-4 md:px-4 py-2 md:py-2 rounded-3xl">Other</span>
                                                     )}
                                                 </div>
+
                                             </div>
 
                                             <div>
