@@ -1,7 +1,10 @@
 import InfiniteScrollSearch from '../components/InfiniteScrollSearch';
 import Pagination from '../components/Pagination';
+import SearchLoader from './SearchLoader';
+import SearchPageWrapper from './SearchPageWrapper';
 import { Post } from '../types/post';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 
 interface TaxonomyNode {
     name: string;
@@ -36,7 +39,8 @@ interface ApiPostItem {
     };
 }
 
-export default async function SearchPage({
+// Server component for search content
+async function SearchPageContent({
     searchParams,
 }: {
     searchParams: Promise<{ keyword?: string; page?: string }>;
@@ -175,4 +179,24 @@ export default async function SearchPage({
             </div>
         );
     }
+}
+
+// Main component
+export default async function SearchPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ keyword?: string; page?: string }>;
+}) {
+    const params = await searchParams;
+    const keyword = params.keyword?.trim() || '';
+
+    if (!keyword) return notFound();
+
+    return (
+        <Suspense fallback={<SearchLoader keyword={keyword} />}>
+            <SearchPageWrapper keyword={keyword}>
+                <SearchPageContent searchParams={searchParams} />
+            </SearchPageWrapper>
+        </Suspense>
+    );
 }
