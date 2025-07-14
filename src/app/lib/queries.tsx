@@ -321,46 +321,9 @@ export const GET_BRANDS_QUERY = gql`
           nodes {
             name
             slug
+            count
           }
         }
-        databaseId
-      }
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-    }
-  }
-`;
-
-export const GET_BRANDS_WITH_POSTS_QUERY = gql`
-  query GetBrandsWithPosts($after: String) {
-    brands(first: 30, after: $after, where: { orderby: { field: TITLE, order: ASC } }) {
-      nodes {
-        seo {
-          title
-          metaDesc
-          opengraphTitle
-          opengraphDescription
-          opengraphImage {
-            sourceUrl
-          }
-        }
-        featuredImage {
-          node {
-            sourceUrl
-            altText
-          }
-        }
-        slug
-        title
-        brandCategories(first: 50) {
-          nodes {
-            name
-            slug
-          }
-        }
-        databaseId
       }
       pageInfo {
         hasNextPage
@@ -384,36 +347,11 @@ export async function getBrandCategoriesData() {
   }
 }
 
-export async function getBrandsData(after: string | null = null) {
-  try {
-    const { data } = await client.query({
-      query: GET_BRANDS_QUERY,
-      variables: { after }
-    });
-
-    const brandsData = data?.brands?.nodes ?? [];
-
-
-    return {
-      brands: brandsData,
-      hasNextPage: data?.brands?.pageInfo?.hasNextPage ?? false,
-      endCursor: data?.brands?.pageInfo?.endCursor ?? '',
-    };
-  } catch (error) {
-    console.error('Error fetching brands data:', error);
-    return {
-      brands: [],
-      hasNextPage: false,
-      endCursor: '',
-    };
-  }
-}
-
 export async function getBrandsWithPostsData(after: string | null = null) {
   try {
     // First, get all brands
     const { data } = await client.query({
-      query: GET_BRANDS_WITH_POSTS_QUERY,
+      query: GET_BRANDS_QUERY,
       variables: { after }
     });
 
@@ -545,40 +483,3 @@ export async function searchBrandsWithPosts(search: string) {
     };
   }
 }
-
-// // Alternative brands query with different ordering approaches
-// export const GET_BRANDS_ORDERED_QUERY = gql`
-//   query GetBrandsOrdered($after: String) {
-//     brands(first: 30, after: $after, where: { orderby: { field: TITLE, order: ASC } }) {
-//       nodes {
-//         seo {
-//           title
-//           metaDesc
-//           opengraphTitle
-//           opengraphDescription
-//           opengraphImage {
-//             sourceUrl
-//           }
-//         }
-//         featuredImage {
-//           node {
-//             sourceUrl
-//             altText
-//           }
-//         }
-//         slug
-//         title
-//         brandCategories(first: 50) {
-//           nodes {
-//             name
-//             slug
-//           }
-//         }
-//       }
-//       pageInfo {
-//         hasNextPage
-//         endCursor
-//       }
-//     }
-//   }
-// `;

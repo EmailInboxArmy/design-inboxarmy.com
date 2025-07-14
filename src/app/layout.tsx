@@ -9,6 +9,7 @@ import GlobalLoader from './components/GlobalLoader';
 import { client } from './lib/apollo-client';
 import { gql } from '@apollo/client';
 import BodyClassHandler from './components/BodyClassHandler';
+import ScrollToTopHandler from './components/ScrollToTopHandler';
 
 const GET_HOME_PAGE_DATA = gql`
 query HomePage {
@@ -77,6 +78,7 @@ export default async function RootLayout({
 
       <body>
         <BodyClassHandler />
+        <ScrollToTopHandler />
         <Suspense fallback={null}>
           <GlobalLoader />
         </Suspense>

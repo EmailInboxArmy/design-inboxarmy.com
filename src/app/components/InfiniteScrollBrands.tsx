@@ -47,6 +47,7 @@ export default function InfiniteScrollBrands({
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
     const [isSearching, setIsSearching] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const { ref, inView } = useInView({
         threshold: 0,
@@ -57,6 +58,7 @@ export default function InfiniteScrollBrands({
         const loadMoreBrands = async () => {
             if (inView && hasNextPage && !isLoading && !searchTerm.trim() && !selectedCategory) {
                 setIsLoading(true);
+                setErrorMessage('');
                 try {
                     const response = await fetch('/api/brands', {
                         method: 'POST',
@@ -69,6 +71,8 @@ export default function InfiniteScrollBrands({
                     });
 
                     if (!response.ok) {
+                        const errorText = await response.text();
+                        setErrorMessage(`Failed to load more brands. (${response.status}) ${errorText}`);
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
 
@@ -81,6 +85,7 @@ export default function InfiniteScrollBrands({
                     }
                 } catch (error) {
                     console.error('Error loading more brands:', error);
+                    if (!errorMessage) setErrorMessage('An error occurred while loading more brands.');
                 } finally {
                     setIsLoading(false);
                 }
@@ -96,6 +101,7 @@ export default function InfiniteScrollBrands({
 
         setIsSearching(true);
         setIsLoading(true);
+        setErrorMessage('');
         try {
             const response = await fetch('/api/brands/search', {
                 method: 'POST',
@@ -108,6 +114,8 @@ export default function InfiniteScrollBrands({
             });
 
             if (!response.ok) {
+                const errorText = await response.text();
+                setErrorMessage(`Failed to search brands. (${response.status}) ${errorText}`);
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
@@ -125,6 +133,7 @@ export default function InfiniteScrollBrands({
             }
         } catch (error) {
             console.error('Error searching brands:', error);
+            if (!errorMessage) setErrorMessage('An error occurred while searching brands.');
             setBrands([]);
             setHasNextPage(false);
             setEndCursor('');
@@ -132,7 +141,7 @@ export default function InfiniteScrollBrands({
             setIsLoading(false);
             setIsSearching(false);
         }
-    }, []);
+    }, [errorMessage]);
 
     // Debounced search effect
     useEffect(() => {
@@ -233,6 +242,11 @@ export default function InfiniteScrollBrands({
 
             <div className='pt-12 pb-10 md:pt-24 md:pb-24'>
                 <div className='container'>
+                    {errorMessage && (
+                        <div className="text-center mb-8">
+                            <p className="text-lg text-red-600">{errorMessage}</p>
+                        </div>
+                    )}
                     {searchTerm.trim() && (
                         <div className="text-center mb-8">
                             <p className="text-lg text-gray-600">
