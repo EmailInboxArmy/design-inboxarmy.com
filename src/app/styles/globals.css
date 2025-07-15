@@ -722,7 +722,18 @@ textarea {
   margin: 0 auto;
   width: 100%;
   height: 100px;
-  background-color: red;
+  z-index: -100;
+  visibility: hidden;
+  opacity: 0; 
+}
+.brands-postloader {
+  position: absolute;
+  bottom: 100vh;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: 100%;
+  height: 100px;
   z-index: -100;
   visibility: hidden;
   opacity: 0;

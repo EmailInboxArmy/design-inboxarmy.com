@@ -27,18 +27,23 @@ export default function Pagination({
     };
 
     return (
-        <div className="flex justify-center items-center space-x-2 mt-8 postloader">
-            {hasPreviousPage && (
-                <Link href={buildUrl(currentPage - 1)} > </Link>
-            )}
+        <div className="flex justify-center items-center space-x-2 mt-8">
+            <div className="postloader">
+                {hasPreviousPage && (
+                    <Link href={buildUrl(currentPage - 1)} > </Link>
+                )}
 
-            {/* <div className="flex items-center space-x-1">
-                {renderPageNumbers()}
-            </div> */}
+                {/* <div className="flex items-center space-x-1">
+                    {renderPageNumbers()}
+                </div> */}
 
-            {hasNextPage && (
-                <Link href={buildUrl(currentPage + 1)} > </Link>
-            )}
+                {hasNextPage && (
+                    <Link href={buildUrl(currentPage + 1)} > </Link>
+                )}
+            </div>
+            <div className="loading-spinner">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-theme-blue mx-auto mb-4"></div>
+            </div>
         </div>
     );
 } 

@@ -298,7 +298,7 @@ query BrandsData {
 
 export const GET_BRANDS_QUERY = gql`
   query GetBrands($after: String) {
-    brands(first: 30, after: $after, where: { orderby: { field: TITLE, order: ASC } }) {
+    brands(first: 100, after: $after, where: { orderby: { field: TITLE, order: ASC } }) {
       nodes {
         seo {
           title
@@ -317,6 +317,7 @@ export const GET_BRANDS_QUERY = gql`
         }
         slug
         title
+        assignedPostCount
         brandCategories(first: 50) {
           nodes {
             name
@@ -357,10 +358,15 @@ export async function getBrandsWithPostsData(after: string | null = null) {
 
     const allBrands = data?.brands?.nodes ?? [];
 
-    // Filter brands to only include those with posts
+    // Filter brands to only include those with posts and assignedPostCount > 0
     const brandsWithPosts = [];
 
     for (const brand of allBrands) {
+      // Skip brands with assignedPostCount of 0
+      if (brand.assignedPostCount === 0) {
+        continue;
+      }
+
       // Check if this brand has any posts
       const { data: postsData } = await client.query({
         query: gql`
@@ -406,7 +412,7 @@ export async function searchBrandsWithPosts(search: string) {
       query: gql`
         query SearchBrands($search: String!) {
           brands(
-            first: 1000, 
+            first: 100, 
             where: { 
               search: $search,
               orderby: { field: TITLE, order: ASC }
@@ -430,6 +436,7 @@ export async function searchBrandsWithPosts(search: string) {
               }
               slug
               title
+              assignedPostCount
               brandCategories(first: 50) {
                 nodes {
                   name
@@ -446,10 +453,15 @@ export async function searchBrandsWithPosts(search: string) {
 
     const allBrands = data?.brands?.nodes ?? [];
 
-    // Filter brands to only include those with posts
+    // Filter brands to only include those with posts and assignedPostCount > 0
     const brandsWithPosts = [];
 
     for (const brand of allBrands) {
+      // Skip brands with assignedPostCount of 0
+      if (brand.assignedPostCount === 0) {
+        continue;
+      }
+
       // Check if this brand has any posts
       const { data: postsData } = await client.query({
         query: gql`

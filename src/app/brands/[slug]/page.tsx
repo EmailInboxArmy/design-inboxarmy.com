@@ -83,7 +83,7 @@ const GET_BRAND_AND_POSTS = gql`
 `;
 
 
- 
+
 
 export async function generateStaticParams() {
   // Optional: Fetch all brand slugs for SSG
@@ -186,7 +186,7 @@ export default async function BrandDetail({ params }: { params: Promise<Params> 
                   </p>
 
 
-                  
+
                 </div>
               </div>
               <div className='w-full md:w-4/12 flex justify-center md:justify-end mt-8 md:mt-0'>

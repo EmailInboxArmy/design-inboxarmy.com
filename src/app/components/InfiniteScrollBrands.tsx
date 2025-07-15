@@ -240,7 +240,7 @@ export default function InfiniteScrollBrands({
                 </div>
             </div>
 
-            <div className='pt-12 pb-10 md:pt-24 md:pb-24'>
+            <div className='pt-12 pb-10 md:pt-24 md:pb-24 relative'>
                 <div className='container'>
                     {errorMessage && (
                         <div className="text-center mb-8">
@@ -282,13 +282,21 @@ export default function InfiniteScrollBrands({
                     )}
 
                     {(isLoading || isSearching) && (
-                        <div className="col-span-full h-10 flex items-center justify-center mt-8">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                        <div>
+                            <div className="col-span-full h-10 flex items-center justify-center mt-8 brands-postloader">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                            </div>
+                            <div className="col-span-full h-10 flex items-center justify-center mt-8">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                            </div>
                         </div>
                     )}
 
                     {hasNextPage && !isLoading && (
-                        <div ref={ref} className="col-span-full h-10 flex items-center justify-center mt-8">
+                        <div>
+                            <div ref={ref} className="col-span-full h-10 flex items-center justify-center mt-8">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                            </div>
                         </div>
                     )}
                 </div>

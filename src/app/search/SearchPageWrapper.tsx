@@ -15,7 +15,7 @@ export default function SearchPageWrapper({ children, keyword }: SearchPageWrapp
         // Show loader for a minimum time to prevent flash
         const timer = setTimeout(() => {
             setIsLoading(false);
-        }, 500);
+        }, 200);
 
         return () => clearTimeout(timer);
     }, [keyword]);
