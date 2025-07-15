@@ -34,7 +34,7 @@ const GET_SEASONAL_BY_SLUG = gql`
         name
         slug
         description
-        posts(first: 24) {
+        posts(first: 24, where: { parent: null }) {
           nodes {
             title
             slug
@@ -44,17 +44,17 @@ const GET_SEASONAL_BY_SLUG = gql`
                 sourceUrl
               }
             }
-            emailTypes {
+            emailTypes(first: 10, where: { parent: null }) {
               nodes {
                 name
               }
             }
-            industries {
+            industries(first: 10, where: { parent: null }) {
               nodes {
                 name
               }
             }
-            seasonals {
+            seasonals(first: 10, where: { parent: null }) {
               nodes {
                 name
               }
@@ -71,7 +71,7 @@ const GET_SEASONAL_BY_SLUG = gql`
   }
 `;
 
-export const revalidate = 10;   
+export const revalidate = 10;
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
 
@@ -89,7 +89,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     variables: {
       slug: [decodedSlug],
     },
-   
+
   });
 
   const seo = data?.seasonals?.nodes?.[0]?.seo;
@@ -156,6 +156,7 @@ export default async function SeasonalPage({ params }: { params: Promise<Params>
           endCursor={seasonalNode?.posts?.pageInfo.endCursor}
           adBoxes={adBoxes}
           activeTagSlug={decodedSlug}
+          filterType="seasonal"
         />
       </div>
 

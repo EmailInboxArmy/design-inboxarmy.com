@@ -16,19 +16,19 @@ export const RECENT_POST_QUERY = gql`
             srcSet(size: MEDIUM)
           }
         }
-        emailTypes {
+        emailTypes(first: 10, where: { parent: null }) {
           nodes {
             name
             slug
           }
         }   
-        industries {
+        industries(first: 10, where: { parent: null }) {
           nodes {
             name
             slug
           }
         }   
-        seasonals {
+        seasonals(first: 10, where: { parent: null }) {
           nodes {
             name
             slug

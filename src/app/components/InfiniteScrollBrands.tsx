@@ -141,7 +141,7 @@ export default function InfiniteScrollBrands({
             setIsLoading(false);
             setIsSearching(false);
         }
-    }, [errorMessage]);
+    }, []);
 
     // Debounced search effect
     useEffect(() => {
