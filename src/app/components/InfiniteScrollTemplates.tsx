@@ -45,12 +45,21 @@ interface AdBox {
     };
 }
 
+interface RequestBody {
+    after: string;
+    emailTypeSlug?: string;
+    industrySlug?: string;
+    seasonalSlug?: string;
+    [key: string]: string | number | boolean | undefined;
+}
+
 interface InfiniteScrollTemplatesProps {
     initialTemplates: Template[];
     hasNextPage: boolean;
     endCursor: string;
     adBoxes: AdBox[];
     activeTagSlug?: string;
+    filterType?: 'emailType' | 'industry' | 'seasonal';
     apiEndpoint?: string;
     apiParams?: Record<string, string | number | boolean>;
 }
@@ -93,6 +102,7 @@ export default function InfiniteScrollTemplates({
     endCursor: initialEndCursor,
     adBoxes,
     activeTagSlug,
+    filterType,
     apiEndpoint = '/api/templates',
     apiParams = {}
 }: InfiniteScrollTemplatesProps) {
@@ -110,15 +120,32 @@ export default function InfiniteScrollTemplates({
         if (inView) {
             setIsLoading(true);
             try {
+                // Prepare request body based on filter type
+                const requestBody: RequestBody = {
+                    after: endCursor,
+                    ...apiParams,
+                };
+
+                if (activeTagSlug && filterType) {
+                    switch (filterType) {
+                        case 'emailType':
+                            requestBody.emailTypeSlug = activeTagSlug;
+                            break;
+                        case 'industry':
+                            requestBody.industrySlug = activeTagSlug;
+                            break;
+                        case 'seasonal':
+                            requestBody.seasonalSlug = activeTagSlug;
+                            break;
+                    }
+                }
+
                 const response = await fetch(apiEndpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        after: endCursor,
-                        ...apiParams,
-                    }),
+                    body: JSON.stringify(requestBody),
                 });
 
                 if (!response.ok) {
@@ -142,7 +169,7 @@ export default function InfiniteScrollTemplates({
             console.log('hasNextPage', hasNextPage);
             console.log('templates', templates);
         }
-    }, [inView, endCursor, templates, hasNextPage, apiEndpoint, apiParams]);
+    }, [inView, endCursor, templates, hasNextPage, apiEndpoint, apiParams, activeTagSlug, filterType]);
 
     useEffect(() => {
         loadMoreTemplates();

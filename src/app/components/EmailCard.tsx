@@ -36,7 +36,13 @@ export default function EmailCard({
     // Helper function to check if a tag is active
     const isTagActive = (tagName: string) => {
         if (!activeTagSlug) return false;
-        const tagSlug = tagName.toLowerCase().replace(/\s+/g, '-');
+        // Convert tag name to slug format: lowercase, replace spaces with hyphens, remove special characters
+        const tagSlug = tagName.toLowerCase()
+            .replace(/[&]/g, '') // Remove & characters
+            .replace(/[^\w\s-]/g, '') // Remove special characters except spaces and hyphens
+            .replace(/\s+/g, '-') // Replace spaces with hyphens
+            .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+            .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
         return activeTagSlug === tagSlug;
     };
 
