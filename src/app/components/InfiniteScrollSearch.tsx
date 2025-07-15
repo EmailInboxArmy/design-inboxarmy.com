@@ -182,13 +182,6 @@ export default function InfiniteScrollSearch({
         loadMorePosts();
     }, [inView, hasNextPage, searchKeyword, currentPageState, totalPages]);
 
-    // Check if there are any taxonomies available
-    const firstPost = posts[0];
-    const hasEmailTypes = firstPost?.emailTypes?.nodes && firstPost.emailTypes.nodes.length > 0;
-    const hasIndustries = firstPost?.industries?.nodes && firstPost.industries.nodes.length > 0;
-    const hasSeasonals = firstPost?.seasonals?.nodes && firstPost.seasonals.nodes.length > 0;
-    const hasAnyTaxonomy = hasEmailTypes || hasIndustries || hasSeasonals;
-
     console.log('Rendering posts:', posts.length, 'hasNextPage:', hasNextPage, 'isLoading:', isLoading);
 
     return (
@@ -235,7 +228,7 @@ export default function InfiniteScrollSearch({
                                         {seasonal.name}
                                     </span>
                                 ))}
-                                {!hasAnyTaxonomy && (
+                                {(!post.emailTypes?.nodes?.length && !post.industries?.nodes?.length && !post.seasonals?.nodes?.length) && (
                                     <span className="text-xxs md:text-sm block leading-4 bg-theme-light-gray text-theme-dark px-2 md:px-4 py-1 md:py-2 rounded-md font-normal">Other</span>
                                 )}
                             </div>
