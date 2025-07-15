@@ -71,46 +71,96 @@ async function SearchPageContent({
         const data = await response.json();
         console.log('API Response:', data);
 
+        // Validate that data exists and has the expected structure
+        if (!data || typeof data !== 'object') {
+            console.log('No data returned from API');
+            return (
+                <div className="relative">
+                    <div className="my-10 md:my-24">
+                        <div className="container">
+                            <div className="max-w-2xl mx-auto mb-4">
+                                <h1 className="text-center mb-6">Search Results for:</h1>
+                                <p className="h3 text-center mb-4">&ldquo;{keyword}&rdquo;</p>
+                            </div>
+                            <div className="text-center my-4">
+                                <h2 className="text-xl font-semibold mb-4">No results found</h2>
+                                <p className="text-gray-600">Try searching with different keywords.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Check if the API returned an error response
+        if (data.error || data.message) {
+            console.log('API returned error:', data.error || data.message);
+            return (
+                <div className="relative">
+                    <div className="my-10 md:my-24">
+                        <div className="container">
+                            <div className="max-w-2xl mx-auto mb-4">
+                                <h1 className="text-center mb-6">Search Results for:</h1>
+                                <p className="h3 text-center mb-4">&ldquo;{keyword}&rdquo;</p>
+                            </div>
+                            <div className="text-center my-4">
+                                <h2 className="text-xl font-semibold mb-4">No results found</h2>
+                                <p className="text-gray-600">Try searching with different keywords.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
         // Transform the data to match the expected Post interface
         // The API returns { nodes: [...], pagination: {...} }
-        const results: Post[] = Array.isArray(data.nodes)
-            ? data.nodes.map((item: ApiPostItem) => {
-                // Helper function to safely parse taxonomy nodes
-                const parseTaxonomyNodes = (taxonomyData: TaxonomyNode[] | string | undefined): TaxonomyData => {
-                    if (Array.isArray(taxonomyData)) {
-                        return { nodes: taxonomyData };
-                    } else if (typeof taxonomyData === 'string' && taxonomyData.trim()) {
-                        // If it's a string, try to parse it as JSON or split by comma
-                        try {
-                            const parsed = JSON.parse(taxonomyData);
-                            return { nodes: Array.isArray(parsed) ? parsed : [] };
-                        } catch {
-                            // If not JSON, split by comma and create objects
-                            const items = taxonomyData.split(',').map((name: string) => ({ name: name.trim() }));
-                            return { nodes: items };
-                        }
-                    }
-                    return { nodes: [] };
-                };
+        let results: Post[] = [];
 
-                return {
-                    id: item.id || String(Math.random()),
-                    title: item.title || '',
-                    slug: item.slug || '',
-                    excerpt: item.excerpt || '',
-                    date: item.date || '',
-                    featuredImage: item.featuredImage || {
-                        node: {
-                            sourceUrl: '',
-                            altText: item.title || ''
+        try {
+            results = Array.isArray(data.nodes)
+                ? data.nodes.map((item: ApiPostItem) => {
+                    // Helper function to safely parse taxonomy nodes
+                    const parseTaxonomyNodes = (taxonomyData: TaxonomyNode[] | string | undefined): TaxonomyData => {
+                        if (Array.isArray(taxonomyData)) {
+                            return { nodes: taxonomyData };
+                        } else if (typeof taxonomyData === 'string' && taxonomyData.trim()) {
+                            // If it's a string, try to parse it as JSON or split by comma
+                            try {
+                                const parsed = JSON.parse(taxonomyData);
+                                return { nodes: Array.isArray(parsed) ? parsed : [] };
+                            } catch {
+                                // If not JSON, split by comma and create objects
+                                const items = taxonomyData.split(',').map((name: string) => ({ name: name.trim() }));
+                                return { nodes: items };
+                            }
                         }
-                    },
-                    emailTypes: parseTaxonomyNodes(item.emailTypes?.nodes),
-                    industries: parseTaxonomyNodes(item.industries?.nodes),
-                    seasonals: parseTaxonomyNodes(item.seasonals?.nodes),
-                };
-            })
-            : [];
+                        return { nodes: [] };
+                    };
+
+                    return {
+                        id: item.id || String(Math.random()),
+                        title: item.title || '',
+                        slug: item.slug || '',
+                        excerpt: item.excerpt || '',
+                        date: item.date || '',
+                        featuredImage: item.featuredImage || {
+                            node: {
+                                sourceUrl: '',
+                                altText: item.title || ''
+                            }
+                        },
+                        emailTypes: parseTaxonomyNodes(item.emailTypes?.nodes),
+                        industries: parseTaxonomyNodes(item.industries?.nodes),
+                        seasonals: parseTaxonomyNodes(item.seasonals?.nodes),
+                    };
+                })
+                : [];
+        } catch (transformError) {
+            console.error('Error transforming data:', transformError);
+            // If transformation fails, treat as no results
+            results = [];
+        }
 
         // Get pagination info from API response
         const pagination = data.pagination || {};
@@ -136,7 +186,6 @@ async function SearchPageContent({
                         <div className="max-w-2xl mx-auto mb-4">
                             <h1 className="text-center mb-6">Search Results for:</h1>
                             <p className="h3 text-center mb-4">&ldquo;{keyword}&rdquo;</p>
-
                         </div>
 
                         {results.length > 0 ? (
@@ -173,9 +222,19 @@ async function SearchPageContent({
     } catch (error) {
         console.error('Search error:', error);
         return (
-            <div className="p-4">
-                <h1 className="text-xl font-bold mb-4">Search Error</h1>
-                <p>Something went wrong while fetching the results. Please try again.</p>
+            <div className="relative">
+                <div className="my-10 md:my-24">
+                    <div className="container">
+                        <div className="max-w-2xl mx-auto mb-4">
+                            <h1 className="text-center mb-6">Search Results for:</h1>
+                            <p className="h3 text-center mb-4">&ldquo;{keyword}&rdquo;</p>
+                        </div>
+                        <div className="text-center my-4">
+                            <h2 className="text-xl font-semibold mb-4">Search Error</h2>
+                            <p className="text-gray-600">Something went wrong while fetching the results. Please try again.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
