@@ -299,7 +299,7 @@ query BrandsData {
 
 export const GET_BRANDS_QUERY = gql`
   query GetBrands($after: String) {
-    brands(first: 100, after: $after, where: { orderby: { field: TITLE, order: ASC } }) {
+    brands(first: 500, after: $after, where: { orderby: { field: TITLE, order: ASC } }) {
       nodes {
         seo {
           title
