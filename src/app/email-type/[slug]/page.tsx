@@ -47,6 +47,21 @@ const GET_EMAIL_TYPE_BY_SLUG = gql`
                 sourceUrl
               }
             }
+            postdata {
+              brand {
+                nodes {
+                  slug
+                  ... on Brand {
+                    id
+                    brandCategories(first: 1) {
+                      nodes {
+                        name
+                      }
+                    }
+                  }
+                }
+              }
+            }
             emailTypes(first: 10, where: { parent: null }) {
               nodes {
                 name
@@ -139,6 +154,7 @@ export default async function EmailTypePage({ params }: { params: Promise<Params
   const { adBoxes } = await getBrandData();
 
   return (
+
     <div className="page-email-type">
       <div className="container">
         <div className="text-center py-10 md:py-20 max-w-6xl w-full m-auto">
@@ -175,6 +191,8 @@ export default async function EmailTypePage({ params }: { params: Promise<Params
           target: ''
         }
       }} />
+
     </div>
+
   );
 }

@@ -5,6 +5,18 @@ import Link from "next/link";
 interface EmailCardProps {
     title: string;
     image: string;
+    postdata?: {
+        brand?: {
+            nodes: {
+                slug: string;
+                brandCategories: {
+                    nodes: {
+                        name: string;
+                    }[];
+                };
+            }[];
+        };
+    };
     template: {
         emailTypes: {
             nodes: {
@@ -31,8 +43,10 @@ export default function EmailCard({
     image,
     template,
     slug,
-    activeTagSlug
+    activeTagSlug,
+    postdata
 }: EmailCardProps) {
+    console.log('postdata', postdata);
     // Helper function to check if a tag is active
     const isTagActive = (tagName: string) => {
         if (!activeTagSlug) return false;
@@ -51,11 +65,11 @@ export default function EmailCard({
     const hasIndustries = template.industries?.nodes?.length > 0;
     const hasSeasonals = template.seasonals?.nodes?.length > 0;
     const hasAnyTaxonomy = hasEmailTypes || hasIndustries || hasSeasonals;
-
-    console.log('hasAnyTaxonomy', template);
+    const brandSlug = postdata?.brand?.nodes?.[0]?.slug || 'other';
+    const brandCategories = postdata?.brand?.nodes?.[0]?.brandCategories?.nodes || [];
 
     return (
-        <Link href={`/${slug}`} className="email-link w-full bg-white shadow-custom rounded-md md:rounded-xl border border-solid border-theme-border overflow-hidden">
+        <Link href={`/${brandSlug}/${slug}`} className="email-link w-full bg-white shadow-custom rounded-md md:rounded-xl border border-solid border-theme-border overflow-hidden">
             <div className="email-image relative w-full overflow-hidden">
                 {image && (
                     <Image className="absolute left-0 right-0 w-full" src={image} width={280} height={480} alt={title} />
@@ -97,7 +111,13 @@ export default function EmailCard({
                         );
                     })}
 
-                    {!hasAnyTaxonomy && (
+                    {brandCategories.map((category, index) => (
+                        <span key={index} className="text-xxs md:text-sm block leading-4 bg-theme-light-gray text-theme-dark px-2 md:px-4 py-1 md:py-2 rounded-md font-normal">
+                            {category.name}
+                        </span>
+                    ))}
+
+                    {!hasAnyTaxonomy && brandCategories.length === 0 && (
                         <span className="text-xxs md:text-sm block leading-4 bg-theme-light-gray text-theme-dark px-2 md:px-4 py-1 md:py-2 rounded-md font-normal">Other</span>
                     )}
                 </div>

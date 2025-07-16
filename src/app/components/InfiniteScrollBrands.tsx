@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -48,11 +48,37 @@ export default function InfiniteScrollBrands({
     const [selectedCategory, setSelectedCategory] = useState('');
     const [isSearching, setIsSearching] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [isCategorySelected, setIsCategorySelected] = useState(false);
 
     const { ref, inView } = useInView({
         threshold: 0,
         rootMargin: '100px',
     });
+
+    // Filter categories to only show those that are actually assigned to brands
+    const availableCategories = useMemo(() => {
+        const categorySet = new Set<string>();
+
+        // Collect all category slugs from current brands
+        brands.forEach(brand => {
+            brand.brandCategories?.nodes?.forEach(category => {
+                categorySet.add(category.slug);
+            });
+        });
+
+        // Filter brandCategories to only include categories that are assigned to brands
+        return brandCategories.filter(category => categorySet.has(category.slug));
+    }, [brands, brandCategories]);
+
+    // Get categories to display based on selection state
+    const displayCategories = useMemo(() => {
+        if (isCategorySelected) {
+            // Show only 10 options when a category is selected
+            return availableCategories.slice(0, 10);
+        }
+        // Show all options when no category is selected (default state)
+        return availableCategories;
+    }, [availableCategories, isCategorySelected]);
 
     useEffect(() => {
         const loadMoreBrands = async () => {
@@ -133,7 +159,7 @@ export default function InfiniteScrollBrands({
             }
         } catch (error) {
             console.error('Error searching brands:', error);
-            if (!errorMessage) setErrorMessage('An error occurred while searching brands.');
+            setErrorMessage('An error occurred while searching brands.');
             setBrands([]);
             setHasNextPage(false);
             setEndCursor('');
@@ -148,6 +174,9 @@ export default function InfiniteScrollBrands({
         const timeoutId = setTimeout(() => {
             if (searchTerm.trim()) {
                 performSearch(searchTerm.trim());
+                // Reset category selection when searching
+                setSelectedCategory('');
+                setIsCategorySelected(false);
             } else {
                 // Reset to initial state if no search/filter
                 setBrands(initialBrands);
@@ -168,6 +197,9 @@ export default function InfiniteScrollBrands({
         e.preventDefault();
         if (searchTerm.trim()) {
             performSearch(searchTerm.trim());
+            // Reset category selection when searching
+            setSelectedCategory('');
+            setIsCategorySelected(false);
         } else {
             // Reset to initial state if search is cleared
             setBrands(initialBrands);
@@ -180,10 +212,17 @@ export default function InfiniteScrollBrands({
     const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
         const newCategory = e.target.value;
         setSelectedCategory(newCategory);
+        setIsCategorySelected(newCategory !== ''); // Set true if a category is selected
 
         // If a category is selected, reset search and show all brands
         if (newCategory) {
             setSearchTerm('');
+            setBrands(initialBrands);
+            setHasNextPage(initialHasNextPage);
+            setEndCursor(initialEndCursor);
+            setIsSearching(false);
+        } else {
+            // If no category is selected, also reset to initial state
             setBrands(initialBrands);
             setHasNextPage(initialHasNextPage);
             setEndCursor(initialEndCursor);
@@ -229,7 +268,7 @@ export default function InfiniteScrollBrands({
                                         className='w-full cursor-pointer text-base font-medium bg-transparent border-none px-2 py-3 md:py-6 pr-4'
                                     >
                                         <option value="">Brands by Category</option>
-                                        {brandCategories.map((category) => (
+                                        {displayCategories.map((category) => (
                                             <option key={category.slug} value={category.slug}>{category.name}</option>
                                         ))}
                                     </select>
@@ -256,7 +295,7 @@ export default function InfiniteScrollBrands({
                     )}
                     <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-2 gap-y-4 md:gap-6 lg:gap-9 lg:px-10 relative'>
                         {filteredBrands.map((brand: Brand, index: number) => (
-                            <Link key={`${brand.slug}-${index}`} href={`/brands/${brand.slug}`} className="bg-white rounded-2xl shadow-md py-8 px-6 flex flex-col items-center border border-solid border-theme-border origin-center transition-all ease-in-out lg:hover:scale-105">
+                            <Link key={`${brand.slug}-${index}`} href={`${brand.slug}`} className="bg-white rounded-2xl shadow-md py-8 px-6 flex flex-col items-center border border-solid border-theme-border origin-center transition-all ease-in-out lg:hover:scale-105">
                                 <div className="w-28 lg:w-[150px] h-28 lg:h-[150px] rounded-full overflow-hidden flex items-center justify-center bg-gray-200 text-gray-700 text-3xl font-bold">
                                     {brand.featuredImage?.node?.sourceUrl ? (
                                         <Image
@@ -295,7 +334,7 @@ export default function InfiniteScrollBrands({
                     {hasNextPage && !isLoading && (
                         <div>
                             <div ref={ref} className="col-span-full h-10 flex items-center justify-center mt-8">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                                {/* <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div> */}
                             </div>
                         </div>
                     )}

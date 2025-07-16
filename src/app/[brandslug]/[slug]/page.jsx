@@ -1,68 +1,76 @@
-import { client } from '../lib/apollo-client';
+import { client } from 'app/lib/apollo-client';
 import { gql } from '@apollo/client';
 import { notFound } from 'next/navigation';
 import { format } from 'date-fns';
 import CategoryeScript from './category-script';
 import './category-detail.css';
 import CodeView from './CodeView';
-import BodyClassHandler from '../components/BodyClassHandler';
+import BodyClassHandler from 'app/components/BodyClassHandler';
 
 import Image from 'next/image';
-import DateIcon from '../images/date-icon.svg';
+import DateIcon from 'app/images/date-icon.svg';
 import Link from 'next/link';
 import RecentPostData from './RecentPostData';
 import MarketingAgency from 'app/components/MarketingAgency';
 import EmailShadowPreview from './ShowEmail';
 
+// Simplified and more robust query
 const POST_QUERY = gql`
   query GetPost($slug: ID!) {
     post(id: $slug, idType: SLUG) {
-        title
-        date
-        postdata {
-            content
-            brand {
+      id
+      title
+      date
+      slug
+      featuredImage {
+        node {
+          sourceUrl
+          altText
+        }
+      }
+      postdata {
+        content
+        brand {
+          nodes {
+            ... on Brand {
+              id
+              title
+              slug
+              featuredImage {
+                node {
+                  sourceUrl
+                }
+              }
+            brandCategories(first: 1) {
                 nodes {
-                ... on Brand {
-                    id
-                    title
-                    slug
-                    featuredImage {
-                    node {
-                        sourceUrl
-                    }
-                    }
+                  name
                 }
-                }
+              }
             }
+          }
         }
-        featuredImage {
-            node {
-            sourceUrl
-            altText
-            }
+      }
+      emailTypes(first: 10, where: { parent: null }) {
+        nodes {
+          id
+          name
+          slug
         }
-        emailTypes(first: 30, where: { parent: null }) {
-            nodes {
-            id
-            name
-            slug
-            }
+      }
+      industries(first: 10, where: { parent: null }) {
+        nodes {
+          id
+          name
+          slug
         }
-        industries(first: 30, where: { parent: null }) {
-            nodes {
-            id
-            name
-            slug
-            }
+      }
+      seasonals(first: 10, where: { parent: null }) {
+        nodes {
+          id
+          name
+          slug
         }
-        seasonals(first: 30, where: { parent: null }) {
-            nodes {
-            id
-            name
-            slug
-            }
-        }
+      }
     }
   }
 `;
@@ -72,50 +80,57 @@ const POSTS_QUERY = gql`
   query GetPosts($slug: String!) {
     posts(where: { name: $slug }, first: 1) {
       nodes {
+        id
         title
         date
+        slug
         featuredImage {
           node {
             sourceUrl
             altText
           }
         }
-        emailTypes(first: 30, where: { parent: null }) {
-          nodes {
-            id
-            name
-            slug
-          }
-        }
-        industries(first: 30, where: { parent: null }) {
-          nodes {
-            id
-            name
-            slug
-          }
-        }
-        seasonals(first: 30, where: { parent: null }) {
-          nodes {
-            id
-            name
-            slug
-          }
-        }
         postdata {
           content
           brand {
-              nodes {
+            nodes {
               ... on Brand {
-                  id
-                  title
-                  slug
-                  featuredImage {
+                id
+                title
+                slug
+                featuredImage {
                   node {
-                      sourceUrl
+                    sourceUrl
                   }
+                }
+                brandCategories(first: 1) {
+                  nodes {
+                    name
                   }
+                }
               }
             }
+          }
+        }
+        emailTypes(first: 10, where: { parent: null }) {
+          nodes {
+            id
+            name
+            slug
+          }
+        }
+        industries(first: 10, where: { parent: null }) {
+          nodes {
+            id
+            name
+            slug
+          }
+        }
+        seasonals(first: 10, where: { parent: null }) {
+          nodes {
+            id
+            name
+            slug
           }
         }
       }
@@ -125,84 +140,81 @@ const POSTS_QUERY = gql`
 
 // Memoize the metadata generation
 export async function generateMetadata({ params }) {
-
     try {
         const awaitedParams = await params;
         let decodedSlug;
         try {
             decodedSlug = decodeURIComponent(awaitedParams.slug);
         } catch (error) {
-            decodedSlug = awaitedParams.slug; // fallback to original slug if decoding fails
+            decodedSlug = awaitedParams.slug;
         }
 
-        let data;
         let post = null;
+
         // Try the original post query first
         try {
             const response = await client.query({
                 query: POST_QUERY,
                 variables: { slug: decodedSlug },
+                errorPolicy: 'all',
+                fetchPolicy: 'network-only',
             });
-            data = response.data;
-            if (data.post) {
-                post = data.post;
+
+            if (response.data?.post) {
+                post = response.data.post;
             }
-        } catch (graphqlError) {
+        } catch (error) {
+            console.log('Original query failed, trying alternative...');
+
             // Try the alternative posts query
             try {
                 const response2 = await client.query({
                     query: POSTS_QUERY,
                     variables: { slug: decodedSlug },
+                    errorPolicy: 'all',
+                    fetchPolicy: 'network-only',
                 });
-                data = response2.data;
-                if (data.posts && data.posts.nodes && data.posts.nodes.length > 0) {
-                    post = data.posts.nodes[0];
+
+                if (response2.data?.posts?.nodes?.[0]) {
+                    post = response2.data.posts.nodes[0];
                 }
-            } catch (graphqlError2) {
-                // Both queries failed, but don't throw error here
+            } catch (error2) {
                 console.log('Both queries failed in generateMetadata');
             }
         }
 
-        // Check if post exists and has required data
-        if (!post || !post.title) {
+        if (!post?.title) {
             return {
                 title: 'Post Not Found',
-            };
-        }
-
-        // Additional validation for required fields
-        if (typeof post.title !== 'string' || post.title.trim() === '') {
-            return {
-                title: 'Post Not Found',
+                description: 'The requested post could not be found.',
             };
         }
 
         return {
             title: post.title,
-            description: post.postdata?.content?.slice(0, 160),
+            description: post.postdata?.content?.slice(0, 160) || 'Email marketing template from InboxArmy',
         };
     } catch (error) {
+        console.error('Error in generateMetadata:', error);
         return {
             title: 'Error',
+            description: 'An error occurred while loading the page.',
         };
     }
 }
 
 export default async function PostDetail({ params }) {
-
     try {
         const awaitedParams = await params;
         let decodedSlug;
         try {
             decodedSlug = decodeURIComponent(awaitedParams.slug);
         } catch (error) {
-            decodedSlug = awaitedParams.slug; // fallback to original slug if decoding fails
+            decodedSlug = awaitedParams.slug;
         }
 
         console.log('Attempting to fetch post with slug:', decodedSlug);
 
-        let data;
         let post = null;
 
         // Try the original post query first
@@ -211,18 +223,18 @@ export default async function PostDetail({ params }) {
             const response = await client.query({
                 query: POST_QUERY,
                 variables: { slug: decodedSlug },
+                errorPolicy: 'all',
+                fetchPolicy: 'network-only',
             });
-            data = response.data;
-            console.log('Original query response:', data);
-            if (data.post) {
-                post = data.post;
+
+            console.log('Original query response:', response.data);
+            if (response.data?.post) {
+                post = response.data.post;
                 console.log('Found post with original query:', post.title);
-            } else {
-                console.log('No post found with original query');
             }
-        } catch (graphqlError) {
+        } catch (error) {
             console.log('Original post query failed, trying alternative...');
-            console.error('GraphQL error:', graphqlError);
+            console.error('GraphQL error:', error);
 
             // Try the alternative posts query
             try {
@@ -230,38 +242,25 @@ export default async function PostDetail({ params }) {
                 const response2 = await client.query({
                     query: POSTS_QUERY,
                     variables: { slug: decodedSlug },
+                    errorPolicy: 'all',
+                    fetchPolicy: 'network-only',
                 });
-                data = response2.data;
-                console.log('Alternative query response:', data);
-                if (data.posts && data.posts.nodes && data.posts.nodes.length > 0) {
-                    post = data.posts.nodes[0];
+
+                console.log('Alternative query response:', response2.data);
+                if (response2.data?.posts?.nodes?.[0]) {
+                    post = response2.data.posts.nodes[0];
                     console.log('Found post with alternative query:', post.title);
-                } else {
-                    console.log('No posts found with alternative query');
                 }
-            } catch (graphqlError2) {
-                console.error('Alternative query also failed:', graphqlError2);
-                // Don't throw error here, just log it and continue
-                console.log('Both queries failed, will redirect to 404');
+            } catch (error2) {
+                console.error('Alternative query also failed:', error2);
             }
         }
 
         console.log('Final post data:', post);
 
         // Check if post exists and has required data
-        if (!post || !post.title || !post.postdata?.content) {
+        if (!post?.title || !post?.postdata?.content) {
             console.log('Post not found or invalid for slug:', decodedSlug);
-            notFound();
-        }
-
-        // Additional validation for required fields
-        if (typeof post.title !== 'string' || post.title.trim() === '') {
-            console.log('Post title is empty or invalid for slug:', decodedSlug);
-            notFound();
-        }
-
-        if (typeof post.postdata?.content !== 'string' || post.postdata.content.trim() === '') {
-            console.log('Post content is empty or invalid for slug:', decodedSlug);
             notFound();
         }
 
@@ -272,6 +271,7 @@ export default async function PostDetail({ params }) {
         const hasIndustries = post.industries?.nodes?.length > 0;
         const hasSeasonals = post.seasonals?.nodes?.length > 0;
         const hasAnyTaxonomy = hasEmailTypes || hasIndustries || hasSeasonals;
+        const hasBrandCategories = post.postdata?.brand?.nodes?.[0]?.brandCategories?.nodes?.length > 0;
 
         return (
             <>
@@ -381,7 +381,7 @@ export default async function PostDetail({ params }) {
                                                         )}
                                                     </div>
                                                     <h1>
-                                                        <Link className="text-2xl font-bold block" href={`/brands/${post.postdata.brand.nodes[0].slug}`}>{post.postdata.brand.nodes[0].title}</Link>
+                                                        <Link className="text-2xl font-bold block" href={`/${post.postdata.brand.nodes[0].slug}`}>{post.postdata.brand.nodes[0].title}</Link>
                                                     </h1>
                                                 </div>
                                             )}
@@ -394,30 +394,38 @@ export default async function PostDetail({ params }) {
                                             <div>
                                                 <h3 className="text-base font-intersemi font-semibold pb-1">Features:</h3>
                                                 <div className="flex flex-wrap gap-2 mt-2">
-                                                    {post.emailTypes.nodes.map((tag, index) => (
+                                                    {post.emailTypes?.nodes?.map((tag, index) => (
                                                         <span key={index} className="text-base font-medium block leading-4 bg-theme-light-gray-2 text-theme-dark px-4 md:px-4 py-2 md:py-2 rounded-3xl">
                                                             {tag.name}
                                                         </span>
                                                     ))}
 
-                                                    {post.industries.nodes.length > 0 && (
+                                                    {post.industries?.nodes?.length > 0 && (
                                                         post.industries.nodes.map((industry, index) => (
                                                             <span key={index} className="text-base font-medium block leading-4 bg-theme-light-gray-2 text-theme-dark px-4 md:px-4 py-2 md:py-2 rounded-3xl">
                                                                 {industry.name}
                                                             </span>
                                                         ))
                                                     )}
-                                                    {post.seasonals.nodes.length > 0 && (
+                                                    {post.seasonals?.nodes?.length > 0 && (
                                                         post.seasonals.nodes.map((seasonal, index) => (
                                                             <span key={index} className="text-base font-medium block leading-4 bg-theme-light-gray-2 text-theme-dark px-4 md:px-4 py-2 md:py-2 rounded-3xl">
                                                                 {seasonal.name}
                                                             </span>
                                                         ))
                                                     )}
+                                                    {!hasAnyTaxonomy && hasBrandCategories && (
+                                                        post.postdata.brand.nodes[0].brandCategories.nodes.map((brandCategory, index) => (
+                                                            <span key={index} className="text-base font-medium block leading-4 bg-theme-light-gray-2 text-theme-dark px-4 md:px-4 py-2 md:py-2 rounded-3xl">
+                                                                {brandCategory.name}
+                                                            </span>
+                                                        ))
+                                                    )}
 
-                                                    {!hasAnyTaxonomy && (
+                                                    {!hasAnyTaxonomy && !hasBrandCategories && (
                                                         <span className="text-base font-medium block leading-4 bg-theme-light-gray-2 text-theme-dark px-4 md:px-4 py-2 md:py-2 rounded-3xl">Other</span>
                                                     )}
+
                                                 </div>
 
                                             </div>
@@ -439,20 +447,20 @@ export default async function PostDetail({ params }) {
                             <h2 className="text-center mb-6 md:mb-10">Maybe you'll also like…</h2>
                             <div className="flex flex-wrap justify-center gap-2 md:gap-3">
                                 <div className="flex flex-wrap justify-center gap-2 mt-2">
-                                    {post.emailTypes.nodes.map((tag, index) => (
+                                    {post.emailTypes?.nodes?.map((tag, index) => (
                                         <Link href={`/email-type/${tag.slug}`} key={index} className="text-sm md:text-base block leading-4 bg-white text-theme-dark hover:bg-theme-blue hover:text-white px-4 md:px-4 py-2 md:py-2 rounded-3xl font-medium">
                                             {tag.name}
                                         </Link>
                                     ))}
 
-                                    {post.industries.nodes.length > 0 && (
+                                    {post.industries?.nodes?.length > 0 && (
                                         post.industries.nodes.map((industry, index) => (
                                             <Link href={`/industry/${industry.slug}`} key={index} className="text-sm md:text-base block leading-4 bg-white text-theme-dark hover:bg-theme-blue hover:text-white px-4 md:px-4 py-2 md:py-2 rounded-3xl font-medium">
                                                 {industry.name}
                                             </Link>
                                         ))
                                     )}
-                                    {post.seasonals.nodes.length > 0 && (
+                                    {post.seasonals?.nodes?.length > 0 && (
                                         post.seasonals.nodes.map((seasonal, index) => (
                                             <Link href={`/seasonal/${seasonal.slug}`} key={index} className="text-sm md:text-base block leading-4 bg-white text-theme-dark hover:bg-theme-blue hover:text-white px-4 md:px-4 py-2 md:py-2 rounded-3xl font-medium">
                                                 {seasonal.name}
@@ -493,7 +501,6 @@ export default async function PostDetail({ params }) {
         );
     } catch (error) {
         console.error('Error fetching post:', error);
-        // Instead of showing an error page, redirect to 404
         notFound();
     }
 }

@@ -2,7 +2,6 @@ import { gql } from '@apollo/client';
 import Link from 'next/link';
 import { client } from 'app/lib/apollo-client';
 import InfiniteScrollBrandPosts from 'app/components/InfiniteScrollBrandPosts';
-import { Params } from 'next/dist/server/request/params';
 import { getBrandData } from 'app/lib/queries';
 import Image from 'next/image';
 
@@ -69,6 +68,12 @@ const GET_BRAND_AND_POSTS = gql`
               slug
               ... on Brand {
                 title
+                id
+                brandCategories(first: 1) {
+                  nodes {
+                    name
+                  }
+                }
               }
             }
           }
@@ -82,8 +87,9 @@ const GET_BRAND_AND_POSTS = gql`
   }
 `;
 
-
-
+interface BrandDetailProps {
+  params: Promise<{ brandslug: string }>;
+}
 
 export async function generateStaticParams() {
   // Optional: Fetch all brand slugs for SSG
@@ -92,11 +98,11 @@ export async function generateStaticParams() {
 
 export const dynamicParams = true;
 
-export default async function BrandDetail({ params }: { params: Promise<Params> }) {
+export default async function BrandDetail({ params }: BrandDetailProps) {
 
   try {
     const resolvedParams = await params;
-    const slug = decodeURIComponent(resolvedParams.slug as string);
+    const slug = decodeURIComponent(resolvedParams.brandslug as string);
 
     // First fetch just the brand to get its ID
     const { data: brandData } = await client.query({

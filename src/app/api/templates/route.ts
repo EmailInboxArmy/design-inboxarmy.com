@@ -16,6 +16,21 @@ const EMAIL_TEMPLATES_QUERY = gql`
                 sourceUrl
               }
             }
+            postdata {
+              brand {
+                nodes {
+                  slug
+                  ... on Brand {
+                    id
+                    brandCategories(first: 1) {
+                      nodes {
+                        name
+                      }
+                    }
+                  }
+                }
+              }
+            }
             emailTypes(first: 10, where: { parent: null }) {
               nodes {
                 id
@@ -60,6 +75,21 @@ const INDUSTRY_TEMPLATES_QUERY = gql`
             featuredImage {
               node {
                 sourceUrl
+              }
+            }
+            postdata {
+              brand {
+                nodes {
+                  slug
+                  ... on Brand {
+                    id
+                    brandCategories(first: 1) {
+                      nodes {
+                        name
+                      }
+                    }
+                  }
+                }
               }
             }
             emailTypes(first: 10, where: { parent: null }) {
@@ -108,6 +138,21 @@ const SEASONAL_TEMPLATES_QUERY = gql`
                 sourceUrl
               }
             }
+            postdata {
+              brand {
+                nodes {
+                  slug
+                  ... on Brand {
+                    id
+                    brandCategories(first: 1) {
+                      nodes {
+                        name
+                      }
+                    }
+                  }
+                }
+              }
+            }
             emailTypes(first: 10, where: { parent: null }) {
               nodes {
                 id
@@ -150,6 +195,21 @@ const GENERAL_TEMPLATES_QUERY = gql`
         featuredImage {
           node {
             sourceUrl
+          }
+        }
+        postdata {
+          brand {
+            nodes {
+              slug
+              ... on Brand {
+                id
+                brandCategories(first: 1) {
+                  nodes {
+                    name
+                  }
+                }
+              }
+            }
           }
         }
         emailTypes(first: 10, where: { parent: null }) {

@@ -41,7 +41,13 @@ const BRAND_POSTS_QUERY = gql`
             nodes {
               slug
               ... on Brand {
+                id
                 title
+                brandCategories(first: 1) {
+                  nodes {
+                    name
+                  }
+                }
               }
             }
           }
@@ -56,21 +62,21 @@ const BRAND_POSTS_QUERY = gql`
 `;
 
 export async function POST(request: Request) {
-    try {
-        const { after, brandId } = await request.json();
+  try {
+    const { after, brandId } = await request.json();
 
-        if (!brandId) {
-            return NextResponse.json({ error: 'Brand ID is required' }, { status: 400 });
-        }
-
-        const { data } = await client.query({
-            query: BRAND_POSTS_QUERY,
-            variables: { after, brandId },
-        });
-
-        return NextResponse.json(data);
-    } catch (error) {
-        console.error('Error fetching brand posts:', error);
-        return NextResponse.json({ error: 'Failed to fetch brand posts' }, { status: 500 });
+    if (!brandId) {
+      return NextResponse.json({ error: 'Brand ID is required' }, { status: 400 });
     }
+
+    const { data } = await client.query({
+      query: BRAND_POSTS_QUERY,
+      variables: { after, brandId },
+    });
+
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error('Error fetching brand posts:', error);
+    return NextResponse.json({ error: 'Failed to fetch brand posts' }, { status: 500 });
+  }
 } 

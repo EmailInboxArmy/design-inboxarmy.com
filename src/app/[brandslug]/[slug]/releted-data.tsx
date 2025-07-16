@@ -1,6 +1,6 @@
 import { GET_POST_WITH_TAXONOMIES } from './getPost';
 import { GET_RELATED_POSTS } from './getRelatedPosts';
-import { client } from '../lib/apollo-client';
+import { client } from 'app/lib/apollo-client';
 import Link from 'next/link';
 
 type Params = {

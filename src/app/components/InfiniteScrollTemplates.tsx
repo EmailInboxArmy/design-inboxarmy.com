@@ -14,6 +14,19 @@ interface Template {
             sourceUrl: string;
         };
     };
+    postdata?: {
+        brand?: {
+            nodes: {
+                slug: string;
+                id: string;
+                brandCategories: {
+                    nodes: {
+                        name: string;
+                    }[];
+                }
+            }[];
+        };
+    };
     emailTypes?: {
         nodes: Array<{
             name: string;
@@ -187,10 +200,12 @@ export default function InfiniteScrollTemplates({
                     title={templates[i].title}
                     image={templates[i].featuredImage?.node?.sourceUrl || ''}
                     slug={templates[i].slug}
+                    postdata={templates[i].postdata}
                     template={templates[i] as Template & {
                         emailTypes: { nodes: { name: string, slug: string }[] };
                         industries: { nodes: { name: string, slug: string }[] };
                         seasonals: { nodes: { name: string, slug: string }[] };
+                        brand: { nodes: { name: string, slug: string, brandCategories: { nodes: { name: string } } }[] };
                     }}
                     activeTagSlug={activeTagSlug}
                 />
