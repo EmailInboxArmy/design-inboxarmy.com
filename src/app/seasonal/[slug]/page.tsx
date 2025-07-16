@@ -44,6 +44,21 @@ const GET_SEASONAL_BY_SLUG = gql`
                 sourceUrl
               }
             }
+            postdata {
+              brand {
+                nodes {
+                  slug
+                  ... on Brand {
+                    id
+                    brandCategories(first: 1) {
+                      nodes {
+                        name
+                      }
+                    }
+                  }
+                }
+              }
+            }
             emailTypes(first: 10, where: { parent: null }) {
               nodes {
                 name

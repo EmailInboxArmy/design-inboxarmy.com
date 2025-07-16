@@ -47,6 +47,12 @@ interface ApiPostItem {
     seasonals?: {
         nodes: TaxonomyNode[] | string;
     };
+    brand?: {
+        node: {
+            slug: string;
+            categories: string;
+        };
+    };
 }
 
 export default function InfiniteScrollSearch({
@@ -162,6 +168,7 @@ export default function InfiniteScrollSearch({
                         emailTypes: parseTaxonomyNodes(item.emailTypes?.nodes),
                         industries: parseTaxonomyNodes(item.industries?.nodes),
                         seasonals: parseTaxonomyNodes(item.seasonals?.nodes),
+                        brand: item.brand,
                     }));
 
                     setPosts(prev => [...prev, ...newPosts]);
@@ -182,7 +189,13 @@ export default function InfiniteScrollSearch({
         loadMorePosts();
     }, [inView, hasNextPage, searchKeyword, currentPageState, totalPages]);
 
-    console.log('Rendering posts:', posts.length, 'hasNextPage:', hasNextPage, 'isLoading:', isLoading);
+    // Check if there are any taxonomies available
+    const firstPost = posts[0];
+    const hasEmailTypes = firstPost?.emailTypes?.nodes && firstPost.emailTypes.nodes.length > 0;
+    const hasIndustries = firstPost?.industries?.nodes && firstPost.industries.nodes.length > 0;
+    const hasSeasonals = firstPost?.seasonals?.nodes && firstPost.seasonals.nodes.length > 0;
+    const hasAnyTaxonomy = hasEmailTypes || hasIndustries || hasSeasonals;
+     
 
     return (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-y-4 gap-x-2 md:gap-5 2xl:gap-8 pb-4 md:pb-12">
@@ -191,7 +204,7 @@ export default function InfiniteScrollSearch({
                     key={post.id}
                     className="w-full bg-white shadow-custom rounded-md md:rounded-xl border border-solid border-theme-border overflow-hidden"
                 >
-                    <Link href={`/${post.slug}`} className="email-link">
+                    <Link href={`/${post.brand?.node?.slug || 'other'}/${post.slug}`} className="email-link">
                         <div className="email-image relative w-full overflow-hidden">
                             <Image
                                 className="absolute left-0 right-0 w-full"
@@ -228,8 +241,15 @@ export default function InfiniteScrollSearch({
                                         {seasonal.name}
                                     </span>
                                 ))}
-                                {(!post.emailTypes?.nodes?.length && !post.industries?.nodes?.length && !post.seasonals?.nodes?.length) && (
-                                    <span className="text-xxs md:text-sm block leading-4 bg-theme-light-gray text-theme-dark px-2 md:px-4 py-1 md:py-2 rounded-md font-normal">Other</span>
+                                {!hasAnyTaxonomy && post.brand?.node?.categories && (
+                                    <>
+                                        <span className="text-xxs md:text-sm leading-4 bg-theme-light-gray text-theme-dark px-2 md:px-4 py-1 md:py-2 rounded-md font-normal"
+                                        >{post.brand?.node?.categories}</span>
+                                    </>
+                                )}
+                                {!post.brand?.node?.categories && (
+                                    <span className="text-xxs md:text-sm leading-4 bg-theme-light-gray text-theme-dark px-2 md:px-4 py-1 md:py-2 rounded-md font-normal"
+                                    >Other</span>
                                 )}
                             </div>
                         </div>

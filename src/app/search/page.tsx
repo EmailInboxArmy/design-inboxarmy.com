@@ -37,6 +37,12 @@ interface ApiPostItem {
     seasonals?: {
         nodes: TaxonomyNode[] | string;
     };
+    brand?: {
+        node: {
+            slug: string;
+            categories: string;
+        };
+    };
 }
 
 // Server component for search content
@@ -70,6 +76,7 @@ async function SearchPageContent({
 
         const data = await response.json();
         console.log('API Response:', data);
+        console.log('First post brand data:', data.nodes?.[0]?.brand);
 
         // Validate that data exists and has the expected structure
         if (!data || typeof data !== 'object') {
@@ -153,6 +160,7 @@ async function SearchPageContent({
                         emailTypes: parseTaxonomyNodes(item.emailTypes?.nodes),
                         industries: parseTaxonomyNodes(item.industries?.nodes),
                         seasonals: parseTaxonomyNodes(item.seasonals?.nodes),
+                        brand: item.brand,
                     };
                 })
                 : [];

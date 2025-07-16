@@ -44,6 +44,21 @@ const GET_INDUSTRY_WITH_POSTS = gql`
                 sourceUrl
               }
             }
+            postdata {
+              brand {
+                nodes {
+                  slug
+                  ... on Brand {
+                    id
+                    brandCategories(first: 1) {
+                      nodes {
+                        name
+                      }
+                    }
+                  }
+                }
+              }
+            }
             emailTypes(first: 10, where: { parent: null }) {
               nodes {
                 name

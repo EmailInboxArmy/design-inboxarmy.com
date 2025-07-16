@@ -16,6 +16,22 @@ export const RECENT_POST_QUERY = gql`
             srcSet(size: MEDIUM)
           }
         }
+        postdata {
+          brand {
+            nodes {
+              slug
+              ... on Brand {
+                title
+                id
+                brandCategories(first: 1) {
+                  nodes {
+                    name
+                  }
+                }
+              }
+            }
+          }
+        }
         emailTypes(first: 10, where: { parent: null }) {
           nodes {
             name
@@ -49,6 +65,20 @@ interface Template {
       srcSet: string;
     };
   };
+  postdata?: {
+    brand?: {
+      nodes: {
+        slug: string;
+        title?: string;
+        id?: string;
+        brandCategories: {
+          nodes: {
+            name: string;
+          }[];
+        };
+      }[];
+    };
+  };
   emailTypes: {
     nodes: { name: string; slug: string }[];
   };
@@ -76,6 +106,7 @@ export default async function RecentPostData() {
             image={template.featuredImage?.node?.sourceUrl || ''}
             template={template}
             slug={template.slug}
+            postdata={template.postdata}
           />
 
         ))}

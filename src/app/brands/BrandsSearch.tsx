@@ -119,11 +119,11 @@ export default function BrandsSearch({ brands, brandCategories }: BrandsSearchPr
                         ))}
                     </div>
 
-                    {filteredBrands.length === 0 && (
+                    {/* {filteredBrands.length === 0 && (
                         <div className="text-center py-12">
                             <p className="text-lg text-gray-600">No brands found matching your search criteria.</p>
                         </div>
-                    )}
+                    )} */}
                 </div>
             </div>
         </>

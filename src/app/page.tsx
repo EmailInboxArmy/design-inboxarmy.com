@@ -17,6 +17,19 @@ interface EmailTemplateData {
           sourceUrl: string;
         };
       };
+      postdata?: {
+        brand?: {
+          nodes: {
+            slug: string;
+            id: string;
+            brandCategories: {
+              nodes: {
+                name: string;
+              }[];
+            };
+          }[];
+        };
+      };
       emailTypes?: {
         nodes: {
           id: string;
@@ -80,7 +93,22 @@ const EMAIL_TEMPLATES_QUERY = gql`
           node {
             sourceUrl
           }
-        }      
+        }  
+        postdata {
+          brand {
+            nodes {
+              slug
+              ... on Brand {
+                id
+                brandCategories(first: 1) {
+                  nodes {
+                    name
+                  }
+                }
+              }
+            }
+          }
+        }    
         emailTypes(first: 10, where: { parent: null }) {
           nodes {
             id

@@ -16,6 +16,19 @@ interface EmailTemplateData {
           sourceUrl: string;
         };
       };
+      postdata: {
+        brand: {
+          nodes: {
+            slug: string;
+            id: string;
+            brandCategories: {
+              nodes: {
+                name: string;
+              }[];
+            };
+          }[];
+        };
+      };
     }[];
     pageInfo: {
       hasNextPage: boolean;
@@ -59,6 +72,21 @@ const EMAIL_TEMPLATES_QUERY = gql`
         title
         slug
         uri
+        postdata {
+          brand {
+            nodes {
+              slug
+              ... on Brand {
+                id
+                brandCategories(first: 1) {
+                  nodes {
+                    name
+                  }
+                }
+              }
+            }
+          }
+        }
         featuredImage {
           node {
             sourceUrl

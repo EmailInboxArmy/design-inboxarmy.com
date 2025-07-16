@@ -287,10 +287,11 @@ export async function getBrandPageData() {
 
 export const GET_BRAND_CATEGORIES_QUERY = gql`
 query BrandsData {
-  brandCategories {
+  brandCategories(first: 10000) {
     nodes {
       name
       slug
+      count
     }
   }
 }
@@ -336,9 +337,39 @@ export const GET_BRANDS_QUERY = gql`
 
 export async function getBrandCategoriesData() {
   try {
-    const { data } = await client.query({ query: GET_BRAND_CATEGORIES_QUERY });
+    let allCategories: Array<{ name: string; slug: string }> = [];
+    let hasNextPage = true;
+    let endCursor: string | null = null;
+
+    while (hasNextPage) {
+      const { data }: { data: { brandCategories?: { nodes: Array<{ name: string; slug: string; count: number }>; pageInfo: { hasNextPage: boolean; endCursor: string } } } } = await client.query({
+        query: gql`
+          query GetBrandCategories($after: String) {
+            brandCategories(first: 10000, after: $after) {
+              nodes {
+                name
+                slug
+                count
+              }
+              pageInfo {
+                hasNextPage
+                endCursor
+              }
+            }
+          }
+        `,
+        variables: { after: endCursor }
+      });
+
+      const categories = data?.brandCategories?.nodes ?? [];
+      allCategories = [...allCategories, ...categories];
+
+      hasNextPage = data?.brandCategories?.pageInfo?.hasNextPage ?? false;
+      endCursor = data?.brandCategories?.pageInfo?.endCursor ?? null;
+    }
+
     return {
-      brandCategories: data?.brandCategories?.nodes ?? [],
+      brandCategories: allCategories,
     };
   } catch (error) {
     console.error('Error fetching brand categories data:', error);

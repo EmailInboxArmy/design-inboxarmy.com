@@ -380,6 +380,17 @@ textarea {
   .page-home .sticky-header.top-header .search-row {
     display: block;
   }
+
+  .child-menu a {
+    line-height: 1.35;
+  }
+
+  .child-menu {
+    max-height: calc(100vh - 100px);
+    overflow: auto;
+  }
+
+  /* .child-menu>ul { padding: 16px; } */
 }
 
 @media(max-width: 1279px) {
@@ -713,6 +724,7 @@ textarea {
     font-size: 22px;
   }
 }
+
 /* Loaders */
 .postloader {
   position: absolute;
@@ -724,7 +736,20 @@ textarea {
   height: 100px;
   z-index: -100;
   visibility: hidden;
-  opacity: 0; 
+  opacity: 0;
 }
-.brands-postloader { position: absolute; bottom: 100vh; left: 0; right: 0; margin: 0 auto; width: 100%; height: 100px; z-index: -100; visibility: hidden; opacity: 0; }
+
+.brands-postloader {
+  position: absolute;
+  bottom: 100vh;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: 100%;
+  height: 100px;
+  z-index: -100;
+  visibility: hidden;
+  opacity: 0;
+}
+
 /* Loaders */

@@ -46,12 +46,12 @@ export async function herodata() {
 
 export async function getTotalPostCount() {
     const query = gql`
-    query GetTotalPostCount {
-    posts {
-      totalCount
-    }
-  }
-  `;
+        query GetTotalPostCount {
+            posts {
+            totalCount
+            }
+        }
+    `;
 
     try {
         const { data } = await client.query({ query });

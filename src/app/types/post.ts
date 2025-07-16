@@ -28,4 +28,10 @@ export interface Post {
             slug?: string;
         }>;
     };
+    brand?: {
+        node?: {
+            slug: string;
+            categories: string;
+        };
+    };
 } 
