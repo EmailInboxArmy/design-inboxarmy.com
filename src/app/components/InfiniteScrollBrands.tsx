@@ -331,13 +331,13 @@ export default function InfiniteScrollBrands({
                         </div>
                     )}
 
-                    {hasNextPage && !isLoading && (
+                    {/* {hasNextPage && !isLoading && (
                         <div>
                             <div ref={ref} className="col-span-full h-10 flex items-center justify-center mt-8">
                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
                             </div>
                         </div>
-                    )}
+                    )} */}
                 </div>
             </div>
         </>
