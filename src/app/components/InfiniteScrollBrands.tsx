@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useInView } from 'react-intersection-observer';
 import Image from 'next/image';
 import Link from 'next/link';
+import Willow from '../images/willow.jpg';
 
 interface Brand {
     featuredImage?: {
@@ -14,24 +15,21 @@ interface Brand {
     };
     slug: string;
     title: string;
+    assignedPostCount: number;
     brandCategories?: {
         nodes: Array<{
             name: string;
             slug: string;
+            count: number;
         }>;
     };
-}
-
-interface BrandCategory {
-    name: string;
-    slug: string;
 }
 
 interface InfiniteScrollBrandsProps {
     initialBrands: Brand[];
     hasNextPage: boolean;
     endCursor: string;
-    brandCategories: BrandCategory[];
+    brandCategories: Array<{ name: string; slug: string; count: number }>;
 }
 
 export default function InfiniteScrollBrands({
@@ -47,44 +45,24 @@ export default function InfiniteScrollBrands({
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
     const [isSearching, setIsSearching] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
-    const [isCategorySelected, setIsCategorySelected] = useState(false);
+    const [isFiltering, setIsFiltering] = useState(false);
+    const [showLoader, setShowLoader] = useState(false);
+
+    // Debug logging
+    console.log('InfiniteScrollBrands initialized with:');
+    console.log('Initial brands count:', initialBrands.length);
+    console.log('Initial brands:', initialBrands.map(b => ({ title: b.title, categories: b.brandCategories?.nodes?.map(c => c.slug) })));
+    console.log('Brand categories:', brandCategories);
 
     const { ref, inView } = useInView({
         threshold: 0,
         rootMargin: '100px',
     });
 
-    // Filter categories to only show those that are actually assigned to brands
-    const availableCategories = useMemo(() => {
-        const categorySet = new Set<string>();
-
-        // Collect all category slugs from current brands
-        brands.forEach(brand => {
-            brand.brandCategories?.nodes?.forEach(category => {
-                categorySet.add(category.slug);
-            });
-        });
-
-        // Filter brandCategories to only include categories that are assigned to brands
-        return brandCategories.filter(category => categorySet.has(category.slug));
-    }, [brands, brandCategories]);
-
-    // Get categories to display based on selection state
-    const displayCategories = useMemo(() => {
-        if (isCategorySelected) {
-            // Show only 10 options when a category is selected
-            return availableCategories.slice(0, 10);
-        }
-        // Show all options when no category is selected (default state)
-        return availableCategories;
-    }, [availableCategories, isCategorySelected]);
-
     useEffect(() => {
         const loadMoreBrands = async () => {
             if (inView && hasNextPage && !isLoading && !searchTerm.trim() && !selectedCategory) {
                 setIsLoading(true);
-                setErrorMessage('');
                 try {
                     const response = await fetch('/api/brands', {
                         method: 'POST',
@@ -97,8 +75,6 @@ export default function InfiniteScrollBrands({
                     });
 
                     if (!response.ok) {
-                        const errorText = await response.text();
-                        setErrorMessage(`Failed to load more brands. (${response.status}) ${errorText}`);
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
 
@@ -111,7 +87,6 @@ export default function InfiniteScrollBrands({
                     }
                 } catch (error) {
                     console.error('Error loading more brands:', error);
-                    if (!errorMessage) setErrorMessage('An error occurred while loading more brands.');
                 } finally {
                     setIsLoading(false);
                 }
@@ -121,121 +96,152 @@ export default function InfiniteScrollBrands({
         loadMoreBrands();
     }, [inView, hasNextPage, endCursor, isLoading, searchTerm, selectedCategory]);
 
-    // Function to perform search - server side search
+    // Function to perform server-side search
     const performSearch = useCallback(async (search: string) => {
         console.log('Performing server-side search for:', search);
 
+        setShowLoader(true);
         setIsSearching(true);
         setIsLoading(true);
-        setErrorMessage('');
         try {
             const response = await fetch('/api/brands/search', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    search: search.trim(),
-                }),
+                body: JSON.stringify({ search }),
             });
 
             if (!response.ok) {
-                const errorText = await response.text();
-                setErrorMessage(`Failed to search brands. (${response.status}) ${errorText}`);
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             const data = await response.json();
 
             if (data.brands) {
-                console.log('Search results count:', data.brands.nodes.length);
                 setBrands(data.brands.nodes);
-                setHasNextPage(false); // No pagination for search results
-                setEndCursor('');
-            } else {
-                setBrands([]);
-                setHasNextPage(false);
+                setHasNextPage(false); // No more pages for search results
                 setEndCursor('');
             }
         } catch (error) {
             console.error('Error searching brands:', error);
-            setErrorMessage('An error occurred while searching brands.');
-            setBrands([]);
+            // Fallback to client-side search
+            const filteredBrands = initialBrands.filter((brand: Brand) =>
+                brand.title.toLowerCase().includes(search.toLowerCase())
+            );
+            setBrands(filteredBrands);
             setHasNextPage(false);
             setEndCursor('');
         } finally {
             setIsLoading(false);
             setIsSearching(false);
+            setShowLoader(false);
         }
-    }, []);
+    }, [initialBrands]);
+
+    // Function to perform server-side category filtering
+    const performCategoryFilter = useCallback(async (categorySlug: string) => {
+        console.log('Performing server-side category filter for:', categorySlug);
+
+        setShowLoader(true);
+        setIsFiltering(true);
+        setIsLoading(true);
+        try {
+            const response = await fetch('/api/brands/category', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ category: categorySlug }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Category filter API response:', data);
+
+            if (data.brands) {
+                console.log('Setting brands from category filter:', data.brands.nodes);
+                setBrands(data.brands.nodes);
+                setHasNextPage(false); // No more pages for category results
+                setEndCursor('');
+            }
+        } catch (error) {
+            console.error('Error filtering brands by category:', error);
+            // Fallback to client-side filtering (only for initial brands)
+            console.log('Falling back to client-side filtering for initial brands only');
+            const filteredBrands = initialBrands.filter(brand =>
+                brand.brandCategories?.nodes?.some(category =>
+                    category.slug.toLowerCase() === categorySlug.toLowerCase()
+                )
+            );
+            console.log('Fallback client-side filtering results:', filteredBrands);
+            setBrands(filteredBrands);
+            setHasNextPage(false);
+            setEndCursor('');
+        } finally {
+            setIsLoading(false);
+            setIsFiltering(false);
+            setShowLoader(false);
+        }
+    }, [initialBrands]);
 
     // Debounced search effect
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             if (searchTerm.trim()) {
                 performSearch(searchTerm.trim());
-                // Reset category selection when searching
-                setSelectedCategory('');
-                setIsCategorySelected(false);
+            } else if (selectedCategory) {
+                performCategoryFilter(selectedCategory);
             } else {
                 // Reset to initial state if no search/filter
                 setBrands(initialBrands);
                 setHasNextPage(initialHasNextPage);
                 setEndCursor(initialEndCursor);
                 setIsSearching(false);
+                setIsFiltering(false);
+                setShowLoader(false);
             }
         }, 500); // 500ms delay
 
         return () => clearTimeout(timeoutId);
-    }, [searchTerm, initialBrands, initialHasNextPage, initialEndCursor, performSearch]);
+    }, [searchTerm, selectedCategory, initialBrands, initialHasNextPage, initialEndCursor, performSearch, performCategoryFilter]);
 
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-        setSearchTerm(e.target.value);
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setSearchTerm(value);
+        setSelectedCategory(''); // Clear category when searching
+
+        // Show loader immediately if user is typing
+        if (value.trim()) {
+            setShowLoader(true);
+        }
     };
 
-    const handleSearchSubmit = (e: React.FormEvent): void => {
+    const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (searchTerm.trim()) {
             performSearch(searchTerm.trim());
-            // Reset category selection when searching
-            setSelectedCategory('');
-            setIsCategorySelected(false);
-        } else {
-            // Reset to initial state if search is cleared
-            setBrands(initialBrands);
-            setHasNextPage(initialHasNextPage);
-            setEndCursor(initialEndCursor);
-            setIsSearching(false);
         }
     };
 
-    const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
-        const newCategory = e.target.value;
-        setSelectedCategory(newCategory);
-        setIsCategorySelected(newCategory !== ''); // Set true if a category is selected
+    const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedValue = e.target.value;
+        console.log('Category changed to:', selectedValue);
+        console.log('Available categories:', brandCategories);
+        setSelectedCategory(selectedValue);
+        setSearchTerm(''); // Clear search when filtering by category
 
-        // If a category is selected, reset search and show all brands
-        if (newCategory) {
-            setSearchTerm('');
-            setBrands(initialBrands);
-            setHasNextPage(initialHasNextPage);
-            setEndCursor(initialEndCursor);
-            setIsSearching(false);
-        } else {
-            // If no category is selected, also reset to initial state
-            setBrands(initialBrands);
-            setHasNextPage(initialHasNextPage);
-            setEndCursor(initialEndCursor);
-            setIsSearching(false);
+        // Show loader immediately if category is selected
+        if (selectedValue) {
+            setShowLoader(true);
         }
     };
 
-    // Filter brands by category on client side (applied to current brands state)
-    const filteredBrands = selectedCategory
-        ? brands.filter((brand: Brand) =>
-            brand.brandCategories?.nodes?.some((category: { name: string; slug: string }) => category.slug === selectedCategory)
-        )
-        : brands;
+    // Get the brands to display (no additional filtering needed since we're using server-side)
+    const displayBrands = brands;
 
     return (
         <>
@@ -268,9 +274,13 @@ export default function InfiniteScrollBrands({
                                         className='w-full cursor-pointer text-base font-medium bg-transparent border-none px-2 py-3 md:py-6 pr-4'
                                     >
                                         <option value="">Brands by Category</option>
-                                        {displayCategories.map((category) => (
-                                            <option key={category.slug} value={category.slug}>{category.name}</option>
-                                        ))}
+                                        {brandCategories
+                                            .filter((category) => category.count > 0)
+                                            .map((category) => (
+                                                <option key={category.slug} value={category.slug}>
+                                                    {category.name}
+                                                </option>
+                                            ))}
                                     </select>
                                 </div>
                             </div>
@@ -279,64 +289,84 @@ export default function InfiniteScrollBrands({
                 </div>
             </div>
 
-            <div className='pt-12 pb-10 md:pt-24 md:pb-24 relative'>
+            <div className='pt-12 pb-12 md:pt-24 md:pb-24 relative'>
                 <div className='container'>
-                    {errorMessage && (
-                        <div className="text-center mb-8">
-                            <p className="text-lg text-red-600">{errorMessage}</p>
+                    {/* Temporary debug section */}
+                    {/* {process.env.NODE_ENV === 'development' && (
+                        <div className="mb-8 p-4 bg-gray-100 rounded">
+                            <h3 className="font-bold mb-2">Debug Info:</h3>
+                            <p>Total brands: {brands.length}</p>
+                            <p>Selected category: {selectedCategory}</p>
+                            <p>Available categories: {brandCategories.map(c => c.slug).join(', ')}</p>
+                            <p>Brands with categories: {brands.filter(b => b.brandCategories?.nodes && b.brandCategories.nodes.length > 0).length}</p>
+                            <details>
+                                <summary>Brand categories detail</summary>
+                                <pre className="text-xs mt-2">
+                                    {JSON.stringify(brands.map(b => ({
+                                        title: b.title,
+                                        categories: b.brandCategories?.nodes?.map(c => c.slug)
+                                    })), null, 2)}
+                                </pre>
+                            </details>
                         </div>
-                    )}
+                    )} */}
+
                     {searchTerm.trim() && (
                         <div className="text-center mb-8">
                             <p className="text-lg text-gray-600">
-                                Found {filteredBrands.length} brand{filteredBrands.length !== 1 ? 's' : ''} for &ldquo;{searchTerm}&rdquo;
+                                Found {displayBrands.length} brand{displayBrands.length !== 1 ? 's' : ''} for &ldquo;{searchTerm}&rdquo;
                             </p>
                         </div>
                     )}
-                    <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-2 gap-y-4 md:gap-6 lg:gap-9 lg:px-10 relative'>
-                        {filteredBrands.map((brand: Brand, index: number) => (
-                            <Link key={`${brand.slug}-${index}`} href={`${brand.slug}`} className="bg-white rounded-2xl shadow-md py-8 px-6 flex flex-col items-center border border-solid border-theme-border origin-center transition-all ease-in-out lg:hover:scale-105">
-                                <div className="w-28 lg:w-[150px] h-28 lg:h-[150px] rounded-full overflow-hidden flex items-center justify-center bg-gray-200 text-gray-700 text-3xl font-bold">
-                                    {brand.featuredImage?.node?.sourceUrl ? (
-                                        <Image
-                                            className="w-full h-full object-cover"
-                                            src={brand.featuredImage.node.sourceUrl}
-                                            alt={brand.featuredImage.node.altText || brand.title || "Brand Image"}
-                                            width={150}
-                                            height={150}
-                                        />
-                                    ) : (
-                                        brand.title?.charAt(0).toUpperCase() || '?'
-                                    )}
+                    {!showLoader && (
+                        <>
+                            {selectedCategory && (
+                                <div className="text-center mb-8">
+                                    <p className="text-lg text-gray-600">
+                                        Found {displayBrands.length} brand{displayBrands.length !== 1 ? 's' : ''} in &ldquo;{brandCategories.find(cat => cat.slug === selectedCategory)?.name}&rdquo;
+                                    </p>
                                 </div>
-                                <p className="mt-4 text-base md:text-lg font-semibold text-center text-[#2E2B29]">{brand.title}</p>
-                            </Link>
-                        ))}
-                    </div>
+                            )}
+                            <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-2 gap-y-4 md:gap-6 lg:gap-9 lg:px-10'>
 
-                    {filteredBrands.length === 0 && !isLoading && !isSearching && (
-                        <div className="text-center py-12">
+                                {displayBrands.map((brand: Brand, index: number) => (
+                                    <Link key={`${brand.slug}-${index}`} href={`/${brand.slug}`} className={`bg-white rounded-2xl shadow-md py-8 px-6 flex flex-col items-center border border-solid border-theme-border origin-center transition-all ease-in-out lg:hover:scale-105${brand.assignedPostCount === 0 ? ' count-0' : ''}`}>
+                                        <div className="w-28 lg:w-[150px] h-28 lg:h-[150px] rounded-full overflow-hidden flex items-center justify-center">
+                                            <Image
+                                                className='w-full h-full object-cover'
+                                                src={brand.featuredImage?.node?.sourceUrl || Willow}
+                                                alt={brand.featuredImage?.node?.altText || brand.title || "Brand Image"}
+                                                width={150}
+                                                height={150}
+                                            />
+                                        </div>
+                                        <p className="mt-4 text-base md:text-lg font-semibold text-[#2E2B29] text-center">{brand.title}</p>
+                                    </Link>
+                                ))}
+                            </div>
+                        </>
+                    )}
+
+                    {!showLoader && displayBrands.length === 0 && !isLoading && !isSearching && !isFiltering && (
+                        <div className="text-center pt-12">
                             <p className="text-lg text-gray-600">No brands found matching your search criteria.</p>
                         </div>
                     )}
 
-                    {(isLoading || isSearching) && (
-                        <div>
-                            <div className="col-span-full h-10 flex items-center justify-center mt-8 brands-postloader">
+                    {showLoader && (
+                        <div className="col-span-full h-10 flex items-center justify-center mt-8">
+                            <div className="flex items-center space-x-2">
                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-                            </div>
-                            <div className="col-span-full h-10 flex items-center justify-center mt-8">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                                <span className="text-gray-600">Loading...</span>
                             </div>
                         </div>
                     )}
 
-                    {hasNextPage && !isLoading && (
-                        <div>
-                            <div ref={ref} className="col-span-full h-10 flex items-center justify-center mt-8">
-                                {/* <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div> */}
-                            </div>
-                        </div>
+                    {hasNextPage && !isLoading && !searchTerm.trim() && !selectedCategory && (
+                        <>
+                            <div ref={ref} className="col-span-full h-10 flex items-center justify-center mt-8 brands-postloader"></div>
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                        </>
                     )}
                 </div>
             </div>
