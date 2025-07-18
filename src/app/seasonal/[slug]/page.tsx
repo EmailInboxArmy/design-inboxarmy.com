@@ -59,17 +59,17 @@ const GET_SEASONAL_BY_SLUG = gql`
                 }
               }
             }
-            emailTypes(first: 10, where: { parent: null }) {
+            emailTypes(first: 50, where: { parent: null }) {
               nodes {
                 name
               }
             }
-            industries(first: 10, where: { parent: null }) {
+            industries(first: 50, where: { parent: null }) {
               nodes {
                 name
               }
             }
-            seasonals(first: 10, where: { parent: null }) {
+            seasonals(first: 50, where: { parent: null }) {
               nodes {
                 name
               }

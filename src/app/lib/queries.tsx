@@ -1,6 +1,50 @@
 import { gql } from '@apollo/client';
 import { client } from './apollo-client';
 
+// Type definitions for better type safety
+interface BrandCategory {
+  name: string;
+  slug: string;
+  count: number;
+}
+
+interface BrandImage {
+  sourceUrl?: string;
+  altText?: string;
+}
+
+interface Brand {
+  featuredImage?: {
+    node?: BrandImage;
+  };
+  slug: string;
+  title: string;
+  assignedPostCount: number;
+  brandCategories?: {
+    nodes: BrandCategory[];
+  };
+}
+
+interface ApolloResponse<T> {
+  data?: T;
+}
+
+interface BrandsResponse {
+  brands?: {
+    nodes: Brand[];
+    pageInfo?: {
+      hasNextPage: boolean;
+      endCursor: string;
+    };
+  };
+}
+
+interface BrandCategoriesResponse {
+  brandCategories?: {
+    nodes: BrandCategory[];
+  };
+}
+
 export const SEARCH_POSTS = gql`  
   query SearchQuery($search: String!) {
     posts(
@@ -286,8 +330,8 @@ export async function getBrandPageData() {
 
 
 export const GET_BRAND_CATEGORIES_QUERY = gql`
-query BrandsData {
-  brandCategories(first: 10000) {
+query GetBrands {
+  brandCategories(first: 600)  {
     nodes {
       name
       slug
@@ -299,7 +343,7 @@ query BrandsData {
 
 export const GET_BRANDS_QUERY = gql`
   query GetBrands($after: String) {
-    brands(first: 500, after: $after, where: { orderby: { field: TITLE, order: ASC } }) {
+    brands(first: 600, after: $after, where: { orderby: { field: TITLE, order: ASC } }) {
       nodes {
         seo {
           title
@@ -319,11 +363,10 @@ export const GET_BRANDS_QUERY = gql`
         slug
         title
         assignedPostCount
-        brandCategories(first: 50) {
+        brandCategories(first: 600) {
           nodes {
             name
             slug
-            count
           }
         }
       }
@@ -337,19 +380,122 @@ export const GET_BRANDS_QUERY = gql`
 
 export async function getBrandCategoriesData() {
   try {
-    let allCategories: Array<{ name: string; slug: string }> = [];
+    const { data }: ApolloResponse<BrandCategoriesResponse> = await client.query({ query: GET_BRAND_CATEGORIES_QUERY });
+    const categories = data?.brandCategories?.nodes ?? [];
+
+    console.log('Fetched brand categories:', categories.map((cat: BrandCategory) => ({ name: cat.name, slug: cat.slug })));
+
+    return {
+      brandCategories: categories,
+    };
+  } catch (error) {
+    console.error('Error fetching brand categories data:', error);
+    return {
+      brandCategories: [],
+    };
+  }
+}
+
+export async function getBrandsData(after: string | null = null) {
+  try {
+    const { data }: ApolloResponse<BrandsResponse> = await client.query({
+      query: GET_BRANDS_QUERY,
+      variables: { after }
+    });
+    return {
+      brands: data?.brands?.nodes ?? [],
+      hasNextPage: data?.brands?.pageInfo?.hasNextPage ?? false,
+      endCursor: data?.brands?.pageInfo?.endCursor ?? '',
+    };
+  } catch (error) {
+    console.error('Error fetching brands data:', error);
+    return {
+      brands: [],
+      hasNextPage: false,
+      endCursor: '',
+    };
+  }
+}
+
+// Search brands with posts query
+const SEARCH_BRANDS_QUERY = gql`
+  query SearchBrands($search: String!) {
+    brands(
+      where: { 
+        search: $search
+      },
+      first: 100
+    ) {
+      nodes {
+        featuredImage {
+          node {
+            sourceUrl
+            altText
+          }
+        }
+        slug
+        title
+        assignedPostCount
+        brandCategories(first: 600) {
+          nodes {
+            name
+            slug
+            count
+          }
+        }
+      }
+    }
+  }
+`;
+
+
+
+export async function searchBrandsWithPosts(search: string) {
+  try {
+    const { data } = await client.query({
+      query: SEARCH_BRANDS_QUERY,
+      variables: { search }
+    });
+    return {
+      brands: data?.brands?.nodes ?? [],
+    };
+  } catch (error) {
+    console.error('Error searching brands:', error);
+    return {
+      brands: [],
+    };
+  }
+}
+
+export async function filterBrandsByCategory(categorySlug: string) {
+  try {
+    let allBrands: Brand[] = [];
     let hasNextPage = true;
     let endCursor: string | null = null;
 
+    // Fetch all brands using pagination
     while (hasNextPage) {
-      const { data }: { data: { brandCategories?: { nodes: Array<{ name: string; slug: string; count: number }>; pageInfo: { hasNextPage: boolean; endCursor: string } } } } = await client.query({
+      const { data }: ApolloResponse<BrandsResponse> = await client.query({
         query: gql`
-          query GetBrandCategories($after: String) {
-            brandCategories(first: 10000, after: $after) {
+          query GetAllBrandsForCategory($after: String) {
+            brands(first: 600, after: $after) {
               nodes {
-                name
+                featuredImage {
+                  node {
+                    sourceUrl
+                    altText
+                  }
+                }
                 slug
-                count
+                title
+                assignedPostCount
+                brandCategories(first: 600) {
+                  nodes {
+                    name
+                    slug
+                    count
+                  }
+                }
               }
               pageInfo {
                 hasNextPage
@@ -361,166 +507,38 @@ export async function getBrandCategoriesData() {
         variables: { after: endCursor }
       });
 
-      const categories = data?.brandCategories?.nodes ?? [];
-      allCategories = [...allCategories, ...categories];
+      const brands = data?.brands?.nodes ?? [];
+      allBrands = [...allBrands, ...brands];
 
-      hasNextPage = data?.brandCategories?.pageInfo?.hasNextPage ?? false;
-      endCursor = data?.brandCategories?.pageInfo?.endCursor ?? null;
+      hasNextPage = data?.brands?.pageInfo?.hasNextPage ?? false;
+      endCursor = data?.brands?.pageInfo?.endCursor ?? null;
+
+      console.log(`Fetched batch of ${brands.length} brands. Total so far: ${allBrands.length}`);
     }
 
-    return {
-      brandCategories: allCategories,
-    };
-  } catch (error) {
-    console.error('Error fetching brand categories data:', error);
-    return {
-      brandCategories: [],
-    };
-  }
-}
-
-export async function getBrandsWithPostsData(after: string | null = null) {
-  try {
-    // First, get all brands
-    const { data } = await client.query({
-      query: GET_BRANDS_QUERY,
-      variables: { after }
+    // Debug: Log some brand category data
+    console.log('Sample brand categories:');
+    allBrands.slice(0, 3).forEach((brand: Brand, index: number) => {
+      console.log(`Brand ${index + 1} (${brand.title}):`, brand.brandCategories?.nodes?.map((c: BrandCategory) => ({ name: c.name, slug: c.slug })));
     });
 
-    const allBrands = data?.brands?.nodes ?? [];
+    // Filter brands on the server side with case-insensitive comparison
+    const filteredBrands = allBrands.filter((brand: Brand) =>
+      brand.brandCategories?.nodes?.some((category: BrandCategory) =>
+        category.slug.toLowerCase() === categorySlug.toLowerCase()
+      )
+    );
 
-    // Filter brands to only include those with posts and assignedPostCount > 0
-    const brandsWithPosts = [];
-
-    for (const brand of allBrands) {
-      // Skip brands with assignedPostCount of 0
-      if (brand.assignedPostCount === 0) {
-        continue;
-      }
-
-      // Check if this brand has any posts
-      const { data: postsData } = await client.query({
-        query: gql`
-          query CheckBrandPosts($brandId: String) {
-            posts(
-              first: 1,
-              where: {metaQuery: {metaArray: {key: "brand", value: $brandId}}}
-            ) {
-              nodes {
-                id
-              }
-            }
-          }
-        `,
-        variables: { brandId: brand.databaseId?.toString() }
-      });
-
-      // If the brand has posts, include it
-      if (postsData?.posts?.nodes && postsData.posts.nodes.length > 0) {
-        brandsWithPosts.push(brand);
-      }
-    }
+    console.log(`Filtering brands for category "${categorySlug}":`);
+    console.log(`Total brands fetched: ${allBrands.length}`);
+    console.log(`Filtered brands: ${filteredBrands.length}`);
+    console.log(`Filtered brand names:`, filteredBrands.map((b: Brand) => b.title));
 
     return {
-      brands: brandsWithPosts,
-      hasNextPage: data?.brands?.pageInfo?.hasNextPage ?? false,
-      endCursor: data?.brands?.pageInfo?.endCursor ?? '',
+      brands: filteredBrands,
     };
   } catch (error) {
-    console.error('Error fetching brands with posts data:', error);
-    return {
-      brands: [],
-      hasNextPage: false,
-      endCursor: '',
-    };
-  }
-}
-
-export async function searchBrandsWithPosts(search: string) {
-  try {
-    // First, get all brands that match the search
-    const { data } = await client.query({
-      query: gql`
-        query SearchBrands($search: String!) {
-          brands(
-            first: 100, 
-            where: { 
-              search: $search,
-              orderby: { field: TITLE, order: ASC }
-            }
-          ) {
-            nodes {
-              seo {
-                title
-                metaDesc
-                opengraphTitle
-                opengraphDescription
-                opengraphImage {
-                  sourceUrl
-                }
-              }
-              featuredImage {
-                node {
-                  sourceUrl
-                  altText
-                }
-              }
-              slug
-              title
-              assignedPostCount
-              brandCategories(first: 50) {
-                nodes {
-                  name
-                  slug
-                }
-              }
-              databaseId
-            }
-          }
-        }
-      `,
-      variables: { search: search.trim() }
-    });
-
-    const allBrands = data?.brands?.nodes ?? [];
-
-    // Filter brands to only include those with posts and assignedPostCount > 0
-    const brandsWithPosts = [];
-
-    for (const brand of allBrands) {
-      // Skip brands with assignedPostCount of 0
-      if (brand.assignedPostCount === 0) {
-        continue;
-      }
-
-      // Check if this brand has any posts
-      const { data: postsData } = await client.query({
-        query: gql`
-          query CheckBrandPosts($brandId: String) {
-            posts(
-              first: 1,
-              where: {metaQuery: {metaArray: {key: "brand", value: $brandId}}}
-            ) {
-              nodes {
-                id
-              }
-            }
-          }
-        `,
-        variables: { brandId: brand.databaseId?.toString() }
-      });
-
-      // If the brand has posts, include it
-      if (postsData?.posts?.nodes && postsData.posts.nodes.length > 0) {
-        brandsWithPosts.push(brand);
-      }
-    }
-
-    return {
-      brands: brandsWithPosts,
-    };
-  } catch (error) {
-    console.error('Error searching brands with posts:', error);
+    console.error('Error filtering brands by category:', error);
     return {
       brands: [],
     };

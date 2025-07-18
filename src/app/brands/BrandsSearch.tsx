@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import SearchIcon from '../images/search-icon.svg';
+import Willow from '../images/willow.jpg';
 
 interface Brand {
     featuredImage?: {
@@ -14,10 +15,12 @@ interface Brand {
     };
     slug: string;
     title: string;
+    assignedPostCount: number;
     brandCategories?: {
         nodes: Array<{
             name: string;
             slug: string;
+            count: number;
         }>;
     };
 }
@@ -25,6 +28,7 @@ interface Brand {
 interface BrandCategory {
     name: string;
     slug: string;
+    count: number;
 }
 
 interface BrandsSearchProps {
@@ -85,7 +89,7 @@ export default function BrandsSearch({ brands, brandCategories }: BrandsSearchPr
                                         className='w-full cursor-pointer text-base font-medium bg-transparent border-none px-2 py-3 md:py-6 pr-4'
                                     >
                                         <option value="">Brands by Category</option>
-                                        {brandCategories.map((category) => (
+                                        {brandCategories.filter((category) => category.count > 0).map((category) => (
                                             <option key={category.slug} value={category.slug}>{category.name}</option>
                                         ))}
                                     </select>
@@ -99,31 +103,32 @@ export default function BrandsSearch({ brands, brandCategories }: BrandsSearchPr
             <div className='pt-12 pb-10 md:pt-24 md:pb-24'>
                 <div className='container'>
                     <div className='grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-2 gap-y-4 md:gap-6 lg:gap-9 lg:px-10'>
+                    
                         {filteredBrands.map((brand: Brand, index: number) => (
-                            <Link key={index} href={`/brands/${brand.slug}`} className="bg-white rounded-2xl shadow-md py-8 px-6  flex flex-col items-center border border-solid border-theme-border origin-center transition-all ease-in-out lg:hover:scale-105">
+                            <Link
+                                key={index}
+                                href={`/${brand.slug}`}
+                                className={`bg-white rounded-2xl shadow-md py-8 px-6 flex flex-col items-center border border-solid border-theme-border origin-center transition-all ease-in-out lg:hover:scale-105${brand.assignedPostCount === 0 ? ' count-0' : ''}`}
+                            >
                                 <div className="w-28 lg:w-[150px] h-28 lg:h-[150px] rounded-full overflow-hidden flex items-center justify-center">
-                                    {brand.featuredImage?.node?.sourceUrl ? (
-                                        <Image
-                                            className="w-full h-full object-cover"
-                                            src={brand.featuredImage.node.sourceUrl}
-                                            alt={brand.featuredImage.node.altText || brand.title || "Brand Image"}
-                                            width={150}
-                                            height={150}
-                                        />
-                                    ) : (
-                                        brand.title?.charAt(0).toUpperCase() || '?'
-                                    )}
+                                    <Image
+                                        className='w-full h-full object-cover'
+                                        src={brand.featuredImage?.node?.sourceUrl || Willow}
+                                        alt={brand.featuredImage?.node?.altText || brand.title || "Brand Image"}
+                                        width={150}
+                                        height={150}
+                                    />
                                 </div>
-                                <p className="mt-4 text-base md:text-lg font-semibold text-[#2E2B29]">{brand.title}</p>
+                                <p className="mt-4 text-base md:text-lg font-semibold text-[#2E2B29] text-center">{brand.title}</p>
                             </Link>
                         ))}
                     </div>
 
-                    {/* {filteredBrands.length === 0 && (
+                    {filteredBrands.length === 0 && (
                         <div className="text-center py-12">
                             <p className="text-lg text-gray-600">No brands found matching your search criteria.</p>
                         </div>
-                    )} */}
+                    )}
                 </div>
             </div>
         </>
