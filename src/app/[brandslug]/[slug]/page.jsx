@@ -50,21 +50,21 @@ const POST_QUERY = gql`
           }
         }
       }
-      emailTypes(first: 10, where: { parent: null }) {
+      emailTypes(first: 50, where: { parent: null }) {
         nodes {
           id
           name
           slug
         }
       }
-      industries(first: 10, where: { parent: null }) {
+      industries(first: 50, where: { parent: null }) {
         nodes {
           id
           name
           slug
         }
       }
-      seasonals(first: 10, where: { parent: null }) {
+      seasonals(first: 50, where: { parent: null }) {
         nodes {
           id
           name
@@ -112,21 +112,21 @@ const POSTS_QUERY = gql`
             }
           }
         }
-        emailTypes(first: 10, where: { parent: null }) {
+        emailTypes(first: 50, where: { parent: null }) {
           nodes {
             id
             name
             slug
           }
         }
-        industries(first: 10, where: { parent: null }) {
+        industries(first: 50, where: { parent: null }) {
           nodes {
             id
             name
             slug
           }
         }
-        seasonals(first: 10, where: { parent: null }) {
+        seasonals(first: 50, where: { parent: null }) {
           nodes {
             id
             name

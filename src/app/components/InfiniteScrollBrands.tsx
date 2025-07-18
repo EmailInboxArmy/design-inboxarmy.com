@@ -48,12 +48,6 @@ export default function InfiniteScrollBrands({
     const [isFiltering, setIsFiltering] = useState(false);
     const [showLoader, setShowLoader] = useState(false);
 
-    // Debug logging
-    console.log('InfiniteScrollBrands initialized with:');
-    console.log('Initial brands count:', initialBrands.length);
-    console.log('Initial brands:', initialBrands.map(b => ({ title: b.title, categories: b.brandCategories?.nodes?.map(c => c.slug) })));
-    console.log('Brand categories:', brandCategories);
-
     const { ref, inView } = useInView({
         threshold: 0,
         rootMargin: '100px',
@@ -98,8 +92,6 @@ export default function InfiniteScrollBrands({
 
     // Function to perform server-side search
     const performSearch = useCallback(async (search: string) => {
-        console.log('Performing server-side search for:', search);
-
         setShowLoader(true);
         setIsSearching(true);
         setIsLoading(true);
@@ -141,7 +133,6 @@ export default function InfiniteScrollBrands({
 
     // Function to perform server-side category filtering
     const performCategoryFilter = useCallback(async (categorySlug: string) => {
-        console.log('Performing server-side category filter for:', categorySlug);
 
         setShowLoader(true);
         setIsFiltering(true);
@@ -160,10 +151,8 @@ export default function InfiniteScrollBrands({
             }
 
             const data = await response.json();
-            console.log('Category filter API response:', data);
 
             if (data.brands) {
-                console.log('Setting brands from category filter:', data.brands.nodes);
                 setBrands(data.brands.nodes);
                 setHasNextPage(false); // No more pages for category results
                 setEndCursor('');
@@ -171,13 +160,11 @@ export default function InfiniteScrollBrands({
         } catch (error) {
             console.error('Error filtering brands by category:', error);
             // Fallback to client-side filtering (only for initial brands)
-            console.log('Falling back to client-side filtering for initial brands only');
             const filteredBrands = initialBrands.filter(brand =>
                 brand.brandCategories?.nodes?.some(category =>
                     category.slug.toLowerCase() === categorySlug.toLowerCase()
                 )
             );
-            console.log('Fallback client-side filtering results:', filteredBrands);
             setBrands(filteredBrands);
             setHasNextPage(false);
             setEndCursor('');
@@ -229,8 +216,6 @@ export default function InfiniteScrollBrands({
 
     const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedValue = e.target.value;
-        console.log('Category changed to:', selectedValue);
-        console.log('Available categories:', brandCategories);
         setSelectedCategory(selectedValue);
         setSearchTerm(''); // Clear search when filtering by category
 
@@ -291,25 +276,6 @@ export default function InfiniteScrollBrands({
 
             <div className='pt-12 pb-12 md:pt-24 md:pb-24 relative'>
                 <div className='container'>
-                    {/* Temporary debug section */}
-                    {/* {process.env.NODE_ENV === 'development' && (
-                        <div className="mb-8 p-4 bg-gray-100 rounded">
-                            <h3 className="font-bold mb-2">Debug Info:</h3>
-                            <p>Total brands: {brands.length}</p>
-                            <p>Selected category: {selectedCategory}</p>
-                            <p>Available categories: {brandCategories.map(c => c.slug).join(', ')}</p>
-                            <p>Brands with categories: {brands.filter(b => b.brandCategories?.nodes && b.brandCategories.nodes.length > 0).length}</p>
-                            <details>
-                                <summary>Brand categories detail</summary>
-                                <pre className="text-xs mt-2">
-                                    {JSON.stringify(brands.map(b => ({
-                                        title: b.title,
-                                        categories: b.brandCategories?.nodes?.map(c => c.slug)
-                                    })), null, 2)}
-                                </pre>
-                            </details>
-                        </div>
-                    )} */}
 
                     {searchTerm.trim() && (
                         <div className="text-center mb-8">
@@ -362,12 +328,22 @@ export default function InfiniteScrollBrands({
                         </div>
                     )}
 
-                    {hasNextPage && !isLoading && !searchTerm.trim() && !selectedCategory && (
+                    {hasNextPage && !searchTerm.trim() && !selectedCategory && (
                         <>
-                            <div ref={ref} className="col-span-full h-10 flex items-center justify-center mt-8 brands-postloader"></div>
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                            <div ref={ref} className="col-span-full h-10 flex items-center justify-center mt-8">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                            </div>
                         </>
                     )}
+
+                    {hasNextPage && !searchTerm.trim() && !selectedCategory && (
+                        <>
+                            <div ref={ref} className="col-span-full h-10 flex items-center justify-center mt-8 brands-postloader">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                            </div>
+                        </>
+                    )}
+
                 </div>
             </div>
         </>
