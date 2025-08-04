@@ -728,7 +728,7 @@ textarea {
 /* Loaders */
 .postloader {
   position: absolute;
-  bottom: 250vh;
+  bottom: 150vh;
   left: 0;
   right: 0;
   margin: 0 auto;
